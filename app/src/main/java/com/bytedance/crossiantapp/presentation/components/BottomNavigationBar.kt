@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.dp
  * Shared UI components will be defined here
  */
 enum class BottomNavItem(
-    val route: String,          // 路由路径
-    val title: String,          // 显示标题
-    val icon: ImageVector,      // 图标
-    val isEnabled: Boolean = true  // 是否可点击
+    val route: String,          // route path
+    val title: String,          // Displayed title
+    val icon: ImageVector,
+    val isEnabled: Boolean = true  // whether user can click
 ) {
     HOME(
         route = "home",
@@ -31,19 +31,19 @@ enum class BottomNavItem(
         route = "friends",
         title = "朋友",
         icon = Icons.Default.Face,
-        isEnabled = false  // 占位符，不可点击
+        isEnabled = false
     ),
     CAMERA(
         route = "camera",
         title = "",  // 相机按钮通常不显示文字
         icon = Icons.Default.AddCircle,
-        isEnabled = false  // 占位符，不可点击
+        isEnabled = false
     ),
     MESSAGE(
         route = "message",
         title = "消息",
         icon = Icons.Default.MailOutline,
-        isEnabled = false  // 占位符，不可点击
+        isEnabled = false
     ),
     PROFILE(
         route = "profile",
@@ -69,7 +69,7 @@ fun BottomNavigationBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.White,  // 背景色
+        containerColor = Color.White,  // background color
         tonalElevation = 8.dp  // 阴影高度
     ) {
         // 遍历所有的底部导航项

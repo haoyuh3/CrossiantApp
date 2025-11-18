@@ -1,27 +1,30 @@
 package com.bytedance.crossiantapp
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.bytedance.crossiantapp.ui.theme.CrossiantAppTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import com.bytedance.crossiantapp.presentation.components.BottomNavItem
 import com.bytedance.crossiantapp.presentation.components.BottomNavigationBar
-import com.bytedance.crossiantapp.presentation.home.HomeScreen
-import com.bytedance.crossiantapp.presentation.profile.ProfileScreen
+import com.bytedance.crossiantapp.presentation.navigation.NavGraph
+import com.bytedance.crossiantapp.presentation.navigation.Routes
+import com.bytedance.crossiantapp.ui.theme.CrossiantAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * 应用主Activity
+ * @AndroidEntryPoint 标记这是Hilt的注入点
+ */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             CrossiantAppTheme {
                 MainScreen()
@@ -30,48 +33,53 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+/**
+ * 主屏幕
+ * 包含底部导航和内容区
+ */
 @Composable
 fun MainScreen() {
-    // 使用remember保存选中的Tab状态
-    var selectedTab by remember { mutableStateOf(BottomNavItem.HOME) }
+    // 创建导航控制器
+    val navController = rememberNavController()
+
+    // 记住当前选中的底部Tab
+    var selectedBottomTab by remember { mutableStateOf(BottomNavItem.HOME) }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = selectedTab,
+                selectedItem = selectedBottomTab,
                 onItemSelected = { item ->
-                    selectedTab = item
+                    // 更新选中的Tab
+                    selectedBottomTab = item
+
+                    // 导航到对应的页面
+                    when (item) {
+                        BottomNavItem.HOME -> {
+                            navController.navigate(Routes.HOME) {
+                                // 避免返回栈堆积
+                                popUpTo(Routes.HOME) { inclusive = true }
+                            }
+                        }
+                        BottomNavItem.PROFILE -> {
+                            navController.navigate(Routes.PROFILE) {
+                                popUpTo(Routes.HOME)
+                            }
+                        }
+                        else -> {
+                            // 其他Tab暂不处理
+                        }
+                    }
                 }
             )
         }
     ) { paddingValues ->
-        // 根据选中的Tab显示不同的内容
-        when (selectedTab) {
-            BottomNavItem.HOME -> HomeScreen(
-                modifier = Modifier.padding(paddingValues)
-            )
-            BottomNavItem.PROFILE -> ProfileScreen(
-                modifier = Modifier.padding(paddingValues)
-            )
-            else -> {
-                // 其他Tab暂时不实现
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CrossiantAppTheme {
-        MainScreen()
+        // 导航宿主
+        NavGraph(
+            navController = navController,
+            startDestination = Routes.HOME
+        )
     }
 }
 
