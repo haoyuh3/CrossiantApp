@@ -2,6 +2,14 @@ package com.bytedance.crossiantapp.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bytedance.crossiantapp.presentation.home.components.HomeTabRow
+import com.bytedance.crossiantapp.presentation.home.components.PostCard
 
 /**
  * 首页主界面
@@ -67,11 +76,13 @@ fun HomeScreen(
                     .weight(1f),
         ) {
             when (selectedTab) {
-//                HomeTabItem.BEIJING -> DisabledTabContent("北京")
+                HomeTabItem.COMMUNITY -> CommunityTabContent(
+                    onNavigateToDetail = onNavigateToDetail,
+                    viewModel = viewModel
+                )
 //                HomeTabItem.GROUP_BUY -> DisabledTabContent("团购")
 //                HomeTabItem.FOLLOW -> DisabledTabContent("关注")
 //                HomeTabItem.RECOMMEND -> DisabledTabContent("推荐")
-                HomeTabItem.COMMUNITY -> CommunityTabContent(onNavigateToDetail)
                 else -> DisabledTabContent("暂未开发")
             }
         }
@@ -79,46 +90,173 @@ fun HomeScreen(
 }
 
 /**
- * 社区Tab内容（默认Tab）
- * @param onNavigateToDetail 跳转到详情页的回调
- * @param modifier 修饰符
+ * 社区Tab内容（默认Tab）- 双列瀑布流
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CommunityTabContent(
     onNavigateToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    // TODO: 这里将来会显示社区内容列表
+    // 订阅ViewModel状态
+    val uiState by viewModel.uiState.collectAsState()
+    val posts by viewModel.posts.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
+
+    // 下拉刷新状态
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = { viewModel.refresh() }
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
+    ) {
+        when (uiState) {
+            // 首次加载中
+            is FeedUiState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            // 加载成功 - 显示双列瀑布流
+            is FeedUiState.Success -> {
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),  // 固定2列
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),  // 列间距
+                    verticalItemSpacing = 8.dp,  // 行间距
+                    contentPadding = PaddingValues(16.dp),  // 内边距
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // 作品卡片列表
+                    items(
+                        items = posts,
+                        key = { it.postId }  // 使用postId作为唯一key
+                    ) { post ->
+                        PostCard(
+                            post = post,
+                            onClick = { onNavigateToDetail(post.postId) },
+                            onLikeClick = { viewModel.toggleLike(post.postId) }
+                        )
+                    }
+
+                    // 加载更多触发器
+                    if (posts.isNotEmpty()) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (isLoadingMore) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            }
+
+                            // 触发加载更多
+                            LaunchedEffect(Unit) {
+                                viewModel.loadMore()
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 空态
+            is FeedUiState.Empty -> {
+                EmptyState(
+                    onRetry = { viewModel.loadFeed() },
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            // 错误态
+            is FeedUiState.Error -> {
+                ErrorState(
+                    message = (uiState as FeedUiState.Error).message,
+                    onRetry = { viewModel.loadFeed() },
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+
+        // 下拉刷新指示器
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+}
+
+/**
+ * 空态页面
+ */
+@Composable
+private fun EmptyState(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        modifier = modifier.padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "社区内容",
-            fontSize = 24.sp,
+            text = "暂无内容",
+            fontSize = 16.sp,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = onRetry) {
+            Text("重新加载")
+        }
+    }
+}
+
+/**
+ * 错误态页面
+ */
+@Composable
+private fun ErrorState(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "加载失败",
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = Color.Black
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "这里将显示社区动态列表",
+            text = message,
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = Color.Gray
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // @note：跳转到详情页的按钮
-        Button(
-            onClick = { onNavigateToDetail("test_post_id") },
-        ) {
-            Text("跳转到详情页示例")
+        Button(onClick = onRetry) {
+            Text("重试")
         }
     }
 }

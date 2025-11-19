@@ -10,7 +10,7 @@ import dagger.hilt.android.HiltAndroidApp
  * @HiltAndroidApp 触发Hilt的代码生成，包括应用的基类
  */
 @HiltAndroidApp
-class CrossiantApplication : Application() {
+class CroissantApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

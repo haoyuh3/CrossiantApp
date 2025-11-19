@@ -1,5 +1,23 @@
 package com.bytedance.crossiantapp.data.remote
 
+import com.bytedance.crossiantapp.data.model.FeedResponse
+import retrofit2.http.GET
+import retrofit2.http.Query
+
 /**
- * API interfaces will be defined here
+ * API interfaces
  */
+interface FeedApi {
+    /**
+     * 获取Feed流
+     * @param count 请求数量
+     * @param acceptVideoClip 是否支持下发视频片段（进阶功能）
+     */
+    @GET("feed/")
+    suspend fun getFeed (
+        @Query("count") count: Int,
+        @Query("accept_video_clip") acceptVideoClip: Boolean = false
+    ): FeedResponse
+
+
+}
