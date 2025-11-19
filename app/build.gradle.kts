@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.bytedance.crossiantapp"
+    namespace = "com.bytedance.croissantapp"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.bytedance.crossiantapp"
+        applicationId = "com.bytedance.croissantapp"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
