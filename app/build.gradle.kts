@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material)  // Material (for PullRefresh)
+    implementation(libs.androidx.compose.foundation)  // Foundation (for LazyVerticalStaggeredGrid)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -77,6 +79,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
+
+    // Coil - Image Loading (Compose recommended)
+    implementation(libs.coil.compose)
 
     // Fresco
     implementation(libs.fresco)
