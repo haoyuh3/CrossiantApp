@@ -114,13 +114,13 @@ fun CommunityTabContent(
             color = Color.Gray,
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // @note：跳转到详情页的按钮
         Button(
             onClick = { onNavigateToDetail("test_post_id") },
         ) {
-            Text("跳转到详情页示例")
+            Text("这是一个测试按钮")
         }
     }
 }

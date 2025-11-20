@@ -85,7 +85,7 @@ fun BottomNavigationBar(
                 // 点击事件
                 onClick = {
                     if (item.isEnabled) {
-                        onItemSelected(item) // 与父组件通信
+                        onItemSelected(item) // 回调与父组件通信
                     }
                 },
                 // 图标
@@ -93,7 +93,7 @@ fun BottomNavigationBar(
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.title,
-                        // 相机按钮可以设置大一点
+                        // 调整相机按钮大小
                         modifier =
                             if (item == BottomNavItem.CAMERA) {
                                 Modifier.size(32.dp)
@@ -108,7 +108,7 @@ fun BottomNavigationBar(
                         Text(text = item.title)
                     }
                 },
-                // 是否启用（控制是否可点击）
+                // 是否启用点击
                 enabled = item.isEnabled,
                 // 颜色配置
                 colors =
@@ -122,21 +122,4 @@ fun BottomNavigationBar(
             )
         }
     }
-}
-@Preview(name = "Navigation Bar", showBackground = true)
-@Composable
-fun BottomNavigationBarHomePreview() {
-    var selectedBottomTab by remember { mutableStateOf(BottomNavItem.HOME) }
-
-    Log.d("BottomNavigationBarPreview", "Recomposing with selected tab: ${selectedBottomTab.title}")
-
-    BottomNavigationBar(
-        // 2. 将状态变量传递给子组件，UI更新
-        selectedItem = selectedBottomTab,
-        onItemSelected = { item ->
-            // 3. 在回调中更新状态，触发重组
-            selectedBottomTab = item
-        }
-    )
-
 }
