@@ -1,8 +1,10 @@
 package com.bytedance.croissantapp.presentation.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -31,33 +33,40 @@ fun HomeTabRow(
                 .fillMaxWidth()
                 .height(48.dp)
                 .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween, // 两端对齐
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.Bottom,
     ) {
-        // 左侧的Tab列表
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            HomeTabItem.entries.forEach { tab ->
-                HomeTabButton(
-                    tab = tab,
-                    isSelected = selectedTab == tab,
-                    onClick = {
-                        if (tab.isEnabled) {
-                            onTabSelected(tab)
-                        }
-                    },
-                )
-            }
-        }
-
-        // 右侧的搜索图标
         IconButton(
-            onClick = { /* 搜索功能暂不实现 */ },
-            enabled = false,
+            onClick = { /* 设置功能暂不实现 */ },
+            enabled = true,
         ) {
             Icon(
+                modifier = Modifier.size(24.dp),
+                imageVector = Icons.Default.Menu,
+                contentDescription = "菜单",
+                tint = Color.Gray,
+            )
+        }
+        // Tab列表
+        HomeTabItem.entries.forEach { tab ->
+            HomeTabButton(
+                tab = tab,
+                isSelected = selectedTab == tab,
+                onClick = {
+                    if (tab.isEnabled) {
+                        onTabSelected(tab)
+                    }
+                },
+            )
+        }
+
+        // 搜索图标
+        IconButton(
+            onClick = { /* 搜索功能暂不实现 */ },
+            enabled = true,
+        ) {
+            Icon(
+                modifier = Modifier.size(24.dp),
                 imageVector = Icons.Default.Search,
                 contentDescription = "搜索",
                 tint = Color.Gray,
@@ -77,39 +86,32 @@ private fun HomeTabButton(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .clickable(enabled = tab.isEnabled) { onClick() }
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Tab文字
-        TextButton(
-            onClick = onClick,
-            enabled = tab.isEnabled,
-            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-        ) {
-            Text(
-                text = tab.title,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (isSelected) Color.Black else Color.Gray,
-                fontWeight =
-                    if (isSelected) {
-                        androidx.compose.ui.text.font.FontWeight.Bold
-                    } else {
-                        androidx.compose.ui.text.font.FontWeight.Normal
-                    },
-            )
-        }
+        Text(
+            text = tab.title,
+            style = MaterialTheme.typography.titleMedium,
+            color = if (isSelected) Color.Black else Color.Gray,
+            fontWeight =
+                if (isSelected) {
+                    androidx.compose.ui.text.font.FontWeight.Bold
+                } else {
+                    androidx.compose.ui.text.font.FontWeight.Normal
+                },
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
 
         // 选中时的下划线
-        if (isSelected) {
-            Box(
-                modifier =
-                    Modifier
-                        .width(24.dp)
-                        .height(3.dp)
-                        .background(Color.Black),
-            )
-        } else {
-            Spacer(modifier = Modifier.height(3.dp))
-        }
+        Box(
+            modifier =
+                Modifier
+                    .width(40.dp)
+                    .height(4.dp)
+                    .background(if (isSelected) Color.Gray else Color.White),
+        )
     }
 }
