@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.bytedance.croissantapp.presentation.detail.DetailScreen
 import com.bytedance.croissantapp.presentation.home.HomeScreen
 import com.bytedance.croissantapp.presentation.profile.ProfileScreen
 
@@ -52,13 +53,17 @@ fun NavGraph(
             ProfileScreen()
         }
 
-        // 详情页（后续实现）
+        // 详情页
         composable(route = Routes.DETAIL) { backStackEntry ->
             // 获取路由参数
             val postId = backStackEntry.arguments?.getString("postId")
 
-            // TODO: 实现详情页
-            // DetailScreen(postId = postId ?: "")
+            DetailScreen(
+                postId = postId ?: "",
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }
