@@ -8,13 +8,8 @@ import com.bytedance.croissantapp.data.local.entity.PostEntity;
 
 /**
  * Croissant App 的 Room 数据库
- *
  * 用于本地缓存 Feed 数据，提升用户体验
  *
- * @Database 注解参数：
- * - entities: 数据库包含的表（Entity 类）
- * - version: 数据库版本号（升级时需要递增）
- * - exportSchema: 是否导出数据库 schema（建议开发时设为 true）
  */
 @Database(
     entities = {PostEntity.class},
