@@ -13,6 +13,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
+ * Feed UI状态
+ */
+sealed class FeedUiState {
+    object InitLoading : FeedUiState()      // 首次加载中
+    object Success : FeedUiState()      // 加载成功
+    object Empty : FeedUiState()        // 无数据
+    data class Error(val message: String) : FeedUiState()  // 加载失败
+}
+
+/**
  * 首页ViewModel
  */
 @HiltViewModel
@@ -23,7 +33,7 @@ class HomeViewModel @Inject constructor(
 
     // ==================== UI状态 ====================
 
-    private val _uiState = MutableStateFlow<FeedUiState>(FeedUiState.Loading)
+    private val _uiState = MutableStateFlow<FeedUiState>(FeedUiState.InitLoading)
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
@@ -35,6 +45,7 @@ class HomeViewModel @Inject constructor(
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
+    // 初始化
     init {
         loadFeed()
     }
@@ -46,14 +57,15 @@ class HomeViewModel @Inject constructor(
      */
     fun loadFeed() {
         viewModelScope.launch {
-            _uiState.value = FeedUiState.Loading
+            _uiState.value = FeedUiState.InitLoading
             println("HomeViewModel: 开始加载Feed...")
 
             try {
+                // 调用API获取数据
                 val posts = getFeedUseCase(count = 20)
                 println("HomeViewModel: 从API获取到 ${posts.size} 条数据")
 
-                val postsWithLocalState = enrichPostsWithLocalState(posts)
+                val postsWithLocalState = fillWithLocalState(posts)
 
                 _posts.value = postsWithLocalState
                 _uiState.value = if (postsWithLocalState.isEmpty()) {
@@ -75,12 +87,13 @@ class HomeViewModel @Inject constructor(
      * 下拉刷新
      */
     fun refresh() {
+        // viewModelScope.launch 用于在 Android ViewModel 中执行异步任务
         viewModelScope.launch {
             _isRefreshing.value = true
 
             try {
                 val posts = getFeedUseCase(count = 20)
-                val postsWithLocalState = enrichPostsWithLocalState(posts)
+                val postsWithLocalState = fillWithLocalState(posts)
 
                 _posts.value = postsWithLocalState
                 _uiState.value = if (postsWithLocalState.isEmpty()) {
@@ -107,7 +120,7 @@ class HomeViewModel @Inject constructor(
 
             try {
                 val newPosts = getFeedUseCase(count = 20)
-                val postsWithLocalState = enrichPostsWithLocalState(newPosts)
+                val postsWithLocalState = fillWithLocalState(newPosts)
 
                 // 防止追加重复数据（API可能每次返回相同内容）
                 val existingPostIds = _posts.value.map { it.postId }.toSet()
@@ -155,7 +168,7 @@ class HomeViewModel @Inject constructor(
     /**
      * 为Post列表填充本地状态（点赞、关注）
      */
-    private fun enrichPostsWithLocalState(posts: List<Post>): List<Post> {
+    private fun fillWithLocalState(posts: List<Post>): List<Post> {
         return posts.map { post ->
             post.copy(
                 isLiked = preferencesRepository.getLikeStatus(post.postId),
@@ -165,14 +178,4 @@ class HomeViewModel @Inject constructor(
             )
         }
     }
-}
-
-/**
- * Feed UI状态
- */
-sealed class FeedUiState {
-    object Loading : FeedUiState()      // 首次加载中
-    object Success : FeedUiState()      // 加载成功
-    object Empty : FeedUiState()        // 无数据
-    data class Error(val message: String) : FeedUiState()  // 加载失败
 }

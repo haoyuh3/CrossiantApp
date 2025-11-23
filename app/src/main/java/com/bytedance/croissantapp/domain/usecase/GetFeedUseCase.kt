@@ -6,6 +6,7 @@ import javax.inject.Inject
 
 /**
  * 获取Feed流用例
+ * ViewModel 调用
  */
 class GetFeedUseCase @Inject constructor(
     private val feedRepository: FeedRepository

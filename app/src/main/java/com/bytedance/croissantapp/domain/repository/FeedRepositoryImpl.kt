@@ -13,33 +13,44 @@ class FeedRepositoryImpl @Inject constructor(
 ) : FeedRepository {
 
     // 内存缓存：存储已加载的Post
+    // TODO 替换为Room数据库
     private val postCache = mutableMapOf<String, Post>()
 
     override suspend fun getFeed(count: Int, acceptVideoClip: Boolean): Result<List<Post>> {
         return try {
             println("FeedRepository: 开始请求API - count=$count, acceptVideoClip=$acceptVideoClip")
             val response = feedApi.getFeed(count, acceptVideoClip)
-            println("FeedRepository: API响应 - statusCode=${response.statusCode}, postList size=${response.postList?.size ?: 0}")
+            println("FeedRepository: API响应 - statusCode=${response.statusCode}, postList size=${response.postListSize}")
 
-            if (response.statusCode == 0 && response.postList != null) {
-                val posts = response.postList
-                    .mapNotNull { dto ->
-                        try {
-                            // 验证关键字段
-                            if (dto.postId.isNullOrBlank()) {
-                                println("FeedRepository: 跳过无效数据 - postId为空")
-                                return@mapNotNull null
-                            }
-                            dto.toDomain()
-                        } catch (e: Exception) {
-                            println("FeedRepository: 转换失败 - ${e.message}")
-                            null
+            if (response.statusCode == 0 && response.postList?.isNotEmpty() == true) {
+                val posts = mutableListOf<Post>()
+                val seenPostIds = mutableSetOf<String>()
+
+                for (dto in response.postList) {
+                    try {
+                        if (dto.postId.isNullOrBlank()) {
+                            println("FeedRepository: 跳过无效数据 - postId为空或dto为null")
+                            continue
                         }
+                        // 去重
+                        if (seenPostIds.contains(dto.postId)) {
+                            println("FeedRepository: 跳过重复数据 - postId=${dto.postId}")
+                            continue // 如果 postId 已经存在于 Set 中，跳过
+                        }
+                        // 转换和添加
+                        val post = dto.toDomain() // 转换成领域模型
+                        posts.add(post) // 添加到结果列表中
+                        seenPostIds.add(post.postId) // 将这个 postId 添加到 Set 中，以便后续检查
+
+                    } catch (e: Exception) {
+                        println("FeedRepository: 转换失败 - ${e.message}")
+                        continue // 转换失败也跳过
                     }
-                    .distinctBy { it.postId }  // 根据postId去重，防止API返回重复数据
+                }
 
                 // 缓存到内存
-                posts.forEach { post ->
+                // TODO 替换为数据库
+                for (post in posts) {
                     postCache[post.postId] = post
                 }
                 println("FeedRepository: 成功转换 ${posts.size} 条有效数据，已缓存")

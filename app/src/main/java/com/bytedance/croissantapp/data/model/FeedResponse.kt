@@ -18,14 +18,17 @@ data class FeedResponse(
 
     @SerializedName("post_list")
     val postList: List<PostDto>?
-)
+){
+    val postListSize: Int
+        get() = postList?.size ?: 0
+}
 
 /**
  * 作品DTO
  */
 data class PostDto(
     @SerializedName("post_id")
-    val postId: String?,
+    val postId: String?, // postId 可能为null
 
     val title: String?,
     val content: String?,
@@ -80,7 +83,7 @@ fun PostDto.toDomain(): Post {
         content = content ?: "",
         hashtags = hashtags?.map { it.toDomain() } ?: emptyList(),  // 处理 null
         createTime = createTime ?: 0L,
-        author = author?.toDomain() ?: Author("", "未知用户", ""),
+        author = author?.toDomain() ?: Author("", "空用户名, 未知用户", ""),
         clips = clips?.map { it.toDomain() } ?: emptyList(),  // 处理 null
         music = music?.toDomain(),
         likeCount = 0,  // 默认值，实际应从API返回
@@ -106,8 +109,11 @@ fun ClipDto.toDomain(): Clip {
     )
 }
 
-fun HashtagDto.toDomain(): Hashtag {
-    return Hashtag(start = start, end = end)
+fun HashtagDto.toDomain(): Hashtag{
+    return Hashtag(
+        start = start,
+        end = end,
+    )
 }
 
 fun MusicDto.toDomain(): Music {

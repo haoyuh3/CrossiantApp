@@ -42,7 +42,14 @@ data class Clip(
     val displayAspectRatio: Float
         get() {
             val ratio = width.toFloat() / height
-            return ratio.coerceIn(0.75f, 1.33f)  // 3:4 = 0.75, 4:3 = 1.33
+            return if (ratio < 0.75f) {
+                0.75f
+
+            } else if (ratio > 1.33f) {
+                1.33f
+            } else {
+                ratio
+            }
         }
 }
 

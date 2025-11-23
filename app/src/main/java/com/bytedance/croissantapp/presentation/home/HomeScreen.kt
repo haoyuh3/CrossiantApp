@@ -118,7 +118,7 @@ private fun CommunityTabContent(
     ) {
         when (uiState) {
             // 首次加载中
-            is FeedUiState.Loading -> {
+            is FeedUiState.InitLoading -> {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                     color = MaterialTheme.colorScheme.primary

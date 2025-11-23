@@ -17,4 +17,10 @@ object Constants {
     // MMKV Keys
     const val KEY_LIKED_POSTS = "liked_posts"
     const val KEY_FOLLOWED_USERS = "followed_users"
+    const val KEY_LIKE_PREFIX = "like_status_"
+    const val KEY_FOLLOW_PREFIX = "follow_status_"
+    const val KEY_MUSIC_MUTE = "music_mute_status"
+    const val KEY_USER_NICKNAME = "user_nickname"
+    const val KEY_USER_BIO = "user_bio"
+    const val KEY_USER_AVATAR = "user_avatar"
 }

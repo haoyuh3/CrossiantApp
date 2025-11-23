@@ -57,13 +57,14 @@ fun PostCard(
             }
 
             // 2. 标题/内容区域
-            val displayText = if (post.title.isNotEmpty()) post.title else post.content
+            // 优先使用标题
+            val displayText = post.title.ifEmpty { post.content }
             if (displayText.isNotEmpty()) {
                 Text(
                     text = displayText,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = TextOverflow.Ellipsis, // 使用..截断
                     color = Color.Black,
                     modifier = Modifier.padding(12.dp, 8.dp, 12.dp, 0.dp)
                 )
