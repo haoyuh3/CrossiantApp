@@ -7,7 +7,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import com.bytedance.croissantapp.util.Constants
 import androidx.core.content.edit
-
 /**
  * 用户偏好设置管理（基于SharedPreferences）
  */
@@ -17,7 +16,7 @@ class UserPreferencesRepository @Inject constructor(
 ) {
 
     private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("croissant_prefs", Context.MODE_PRIVATE)
+        context.getSharedPreferences(Constants.APP_PREFS, Context.MODE_PRIVATE)
 
     // ==================== 点赞状态 ====================
     fun setLikeStatus(postId: String, isLiked: Boolean) {
@@ -55,7 +54,7 @@ class UserPreferencesRepository @Inject constructor(
     }
 
     fun getUserNickname(): String {
-        return sharedPreferences.getString(Constants.KEY_USER_NICKNAME, "用户昵称") ?: "用户昵称"
+        return sharedPreferences.getString(Constants.KEY_USER_NICKNAME, Constants.DEFAULT_NICKNAME) ?:Constants.DEFAULT_NICKNAME
     }
 
     fun setUserBio(bio: String) {
@@ -63,7 +62,7 @@ class UserPreferencesRepository @Inject constructor(
     }
 
     fun getUserBio(): String {
-        return sharedPreferences.getString(Constants.KEY_USER_BIO, "这里是个人简介") ?: "这里是个人简介"
+        return sharedPreferences.getString(Constants.KEY_USER_BIO, Constants.DEFAULT_USER_BIO) ?: Constants.DEFAULT_USER_BIO
     }
 
     fun setUserAvatar(uri: String) {

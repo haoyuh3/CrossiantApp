@@ -14,7 +14,7 @@ object Constants {
     // Paging
     const val PAGE_SIZE = 20
 
-    // MMKV Keys
+    // Share Preference Keys
     const val KEY_LIKED_POSTS = "liked_posts"
     const val KEY_FOLLOWED_USERS = "followed_users"
     const val KEY_LIKE_PREFIX = "like_status_"
@@ -23,4 +23,11 @@ object Constants {
     const val KEY_USER_NICKNAME = "user_nickname"
     const val KEY_USER_BIO = "user_bio"
     const val KEY_USER_AVATAR = "user_avatar"
+
+    const val APP_PREFS = "croissant_prefs"
+
+    const val DEFAULT_NICKNAME = "用户昵称"
+
+    const val DEFAULT_USER_BIO = "这里是个人简介"
+
 }

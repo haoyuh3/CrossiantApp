@@ -12,16 +12,16 @@ class GetPostDetailUseCase @Inject constructor(
 ) {
     /**
      * 根据postId获取作品详情
-     * 优先从缓存读取，缓存未命中时再请求API
+     * 优先从数据库读取，未命中时再请求API
      */
     suspend operator fun invoke(postId: String): Post {
-        // 1. 优先从缓存获取
+        // 1. 优先从数据库获取
         feedRepository.getCachedPost(postId)?.let { cachedPost ->
             println("GetPostDetailUseCase: 从缓存获取 postId=$postId")
             return cachedPost
         }
 
-        // 2. 缓存未命中，请求API
+        // 2. 未命中，请求API
         println("GetPostDetailUseCase: 缓存未命中，请求API - postId=$postId")
         val result = feedRepository.getFeed(count = 20)
 
