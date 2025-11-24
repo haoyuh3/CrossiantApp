@@ -1,5 +1,6 @@
 package com.bytedance.croissantapp.presentation.profile
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,12 +38,20 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showEditDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     // 图片选择器
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { viewModel.updateAvatar(it.toString()) }
+        uri?.let {
+            // 申请持久化 URI 访问权限 否则每次打开没有读权限
+            context.contentResolver.takePersistableUriPermission(
+            it,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+            viewModel.updateAvatar(it.toString())
+        }
     }
 
     Column(

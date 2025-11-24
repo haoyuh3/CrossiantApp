@@ -96,4 +96,5 @@ enum class BottomNavItem {
   LoadMore优化） 本地存储、异步加载、状态管理实现是否符合规范
 - 列表滑动是否卡顿 图片展示黑屏比例是否较低 页面转场、图片滑动是否流畅自然/ 用户体验优化测试
 ---
-#### 双列瀑布流 > 详情页 > 进阶功能
+![waterfall.png](E:\code_project\kotlinProject\Croissant\Progress\waterfall.png) ![detail.png](E:\code_project\kotlinProject\Croissant\Progress\detail.png)
+---

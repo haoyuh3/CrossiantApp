@@ -114,6 +114,11 @@ dependencies {
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
 
+    // / ExoPlayer
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
+    implementation("androidx.media3:media3-exoplayer-hls:1.2.0")  // 支持 HLS 流式视频
+
     // SwipeRefreshLayout
     implementation(libs.androidx.swiperefreshlayout)
 

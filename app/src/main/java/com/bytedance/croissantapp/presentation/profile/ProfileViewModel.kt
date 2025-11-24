@@ -32,6 +32,7 @@ class ProfileViewModel @Inject constructor(
             bio = preferencesRepository.getUserBio(),
             avatarUri = preferencesRepository.getUserAvatar()
         )
+        println("avatarUri: ${preferencesRepository.getUserAvatar()}")
     }
 
     fun updateNickname(nickname: String) {

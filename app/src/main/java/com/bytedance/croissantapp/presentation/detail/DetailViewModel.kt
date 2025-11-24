@@ -48,8 +48,7 @@ class DetailViewModel @Inject constructor(
                     author = post.author.copy(
                         isFollowed = preferencesRepository.getFollowStatus(post.author.userId)
                     ),
-                    likeCount = preferencesRepository.getLikeCount(postId)
-
+                    likeCount = preferencesRepository.getLikeCount(postId),
                 )
 
                 _uiState.value = DetailUiState.Success(enrichedPost)
@@ -67,9 +66,7 @@ class DetailViewModel @Inject constructor(
         if (currentState is DetailUiState.Success) {
             val post = currentState.post
             val newLikedStatus = !post.isLiked
-            println("old count: ${post.likeCount}")
             val newLikeCount = if (newLikedStatus) post.likeCount + 1 else (post.likeCount - 1).coerceAtLeast(0)
-            println("new count: $newLikeCount")
             // 更新本地存储
             preferencesRepository.setLikeStatus(post.postId, newLikedStatus)
             preferencesRepository.setLikeCount(post.postId, newLikeCount)
