@@ -110,7 +110,7 @@ private fun CommunityTabContent(
     viewModel: HomeViewModel = hiltViewModel(),
     shouldRefresh: StateFlow<Boolean>? = null
 ) {
-    // 订阅ViewModel状态
+    // 订阅ViewModel状态 只读
     val uiState by viewModel.uiState.collectAsState()
     val posts by viewModel.posts.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -128,7 +128,7 @@ private fun CommunityTabContent(
         }
     }
 
-    // 下拉刷新状态
+    // 下拉刷新状态：连接手势和U
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = { viewModel.refresh() }
@@ -170,7 +170,9 @@ private fun CommunityTabContent(
                     }
 
                     // 加载更多触发器
+                    // 首屏加载成功
                     if (posts.isNotEmpty()) {
+                        // 瀑布流中单独的列
                         item(span = StaggeredGridItemSpan.FullLine) {
                             Box(
                                 modifier = Modifier
@@ -178,6 +180,7 @@ private fun CommunityTabContent(
                                     .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
+                                // 正在加载中
                                 if (isLoadingMore) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(24.dp),
@@ -213,7 +216,7 @@ private fun CommunityTabContent(
             }
         }
 
-        // 下拉刷新指示器
+        // 下拉刷新指示器响应用户手势
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,

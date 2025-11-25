@@ -22,6 +22,7 @@ import com.bytedance.croissantapp.domain.model.ClipType
 import com.bytedance.croissantapp.domain.model.Post
 import com.bytedance.croissantapp.presentation.components.VideoPlayer
 import androidx.compose.foundation.background
+import com.bytedance.croissantapp.util.LikeCntUtil
 
 /**
  * 作品卡片组件
@@ -47,7 +48,7 @@ fun PostCard(
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // 1. 封面图片/视频（如果有）
+            // 1. 封面图片/视频 首个Clip
             val coverClip = post.clips.firstOrNull()
 
             if (coverClip != null) {
@@ -167,7 +168,7 @@ fun PostCard(
                         Spacer(modifier = Modifier.width(4.dp))
 
                         Text(
-                            text = formatCount(post.likeCount),
+                            text = LikeCntUtil.formatCount(post.likeCount),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )
@@ -176,17 +177,4 @@ fun PostCard(
         }
     }
 
-}
-
-/**
- * 格式化数量显示
- * 1000+ → 1k
- * 10000+ → 1w
- */
-private fun formatCount(count: Int): String {
-    return when {
-        count >= 10000 -> "${count / 10000}w"
-        count >= 1000 -> "${count / 1000}k"
-        else -> count.toString()
-    }
 }

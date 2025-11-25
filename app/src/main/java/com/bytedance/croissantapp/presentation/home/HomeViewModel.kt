@@ -24,6 +24,8 @@ sealed class FeedUiState {
 
 /**
  * 首页ViewModel
+ * @param getFeedUseCase 获取Feed列表UseCase
+ * @param preferencesRepository 用户偏好设置仓库
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -33,7 +35,9 @@ class HomeViewModel @Inject constructor(
 
     // ==================== UI状态 ====================
 
+    // 可变
     private val _uiState = MutableStateFlow<FeedUiState>(FeedUiState.InitLoading)
+    // 外部只读
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
@@ -120,6 +124,7 @@ class HomeViewModel @Inject constructor(
 
             try {
                 val newPosts = getFeedUseCase(count = 20)
+                // 加载share preference 点赞量关注信息
                 val postsWithLocalState = fillWithLocalState(newPosts)
 
                 // 防止追加重复数据（API可能每次返回相同内容）
