@@ -111,9 +111,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Lombok
-    compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)
 
     // / ExoPlayer
     implementation("androidx.media3:media3-exoplayer:1.2.0")

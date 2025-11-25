@@ -13,9 +13,8 @@ class GetFeedUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         count: Int = 20,
-        acceptVideoClip: Boolean = true
     ): List<Post> {
-        return feedRepository.getFeed(count, acceptVideoClip)
+        return feedRepository.getFeed(count)
             .getOrElse { emptyList() }
     }
 }

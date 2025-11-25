@@ -68,7 +68,7 @@ fun PostCard(
                         }
 
                         ClipType.VIDEO -> {
-                            // 新增：视频封面 + 播放按钮
+                            // 视频封面 + 播放按钮
                             println("cover clip type: ${coverClip.type}")
                             println("cover clip title: ${coverClip.url}")
                             VideoPlayer(

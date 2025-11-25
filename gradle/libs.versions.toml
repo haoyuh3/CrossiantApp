@@ -98,10 +98,6 @@ fresco = { group = "com.facebook.fresco", name = "fresco", version.ref = "fresco
 fresco-animated-gif = { group = "com.facebook.fresco", name = "animated-gif", version.ref = "fresco" }
 fresco-webp = { group = "com.facebook.fresco", name = "webpsupport", version.ref = "fresco" }
 
-# ARouter
-arouter-api = { group = "com.alibaba", name = "arouter-api", version.ref = "arouter" }
-arouter-compiler = { group = "com.alibaba", name = "arouter-compiler", version.ref = "arouter" }
-
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -123,9 +119,6 @@ androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-
-# Lombok
-lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 
 # SwipeRefreshLayout
 androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version = "1.1.0" }

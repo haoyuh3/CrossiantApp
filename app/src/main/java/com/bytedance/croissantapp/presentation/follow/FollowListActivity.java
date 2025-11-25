@@ -62,7 +62,6 @@ public class FollowListActivity extends Activity {
     private void initData() {
         followUserList = new ArrayList<>();
 
-        // 添加一些模拟数据
         followUserList.add(new FollowUser("1", "小红", "热爱生活，热爱摄影", "", true));
         followUserList.add(new FollowUser("2", "旅行家Tom", "走遍世界的每一个角落", "", true));
         followUserList.add(new FollowUser("3", "美食达人", "探索城市中的美味佳肴", "", true));
@@ -81,9 +80,7 @@ public class FollowListActivity extends Activity {
         adapter.setUserList(followUserList);
 
         // 设置关注按钮点击监听
-        adapter.setFollowClickListener((user, position) -> {
-            handleFollowClick(user, position);
-        });
+        adapter.setFollowClickListener(this::handleFollowClick);
 
         rvFollowList.setLayoutManager(new LinearLayoutManager(this));
         rvFollowList.setAdapter(adapter);
