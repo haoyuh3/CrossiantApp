@@ -29,6 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- 关注列表页面-->
+        <activity
+            android:name=".presentation.follow.FollowListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CroissantApp" />
     </application>
 
 </manifest>

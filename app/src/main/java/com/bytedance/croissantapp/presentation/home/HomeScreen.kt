@@ -15,10 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bytedance.croissantapp.presentation.follow.FollowListLauncher
 import com.bytedance.croissantapp.presentation.home.components.HomeTabRow
 import com.bytedance.croissantapp.presentation.home.components.PostCard
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +46,8 @@ fun HomeScreen(
 ) {
     // 当前选中的Tab
     var selectedTab by remember { mutableStateOf(HomeTabItem.getDefault()) }
+    // 获取Context用于启动Activity
+    val context = LocalContext.current
 
     Column(
         modifier =
@@ -55,7 +59,11 @@ fun HomeScreen(
         HomeTabRow(
             selectedTab = selectedTab,
             onTabSelected = { tab ->
-                selectedTab = tab
+                if (tab == HomeTabItem.FOLLOW && HomeTabItem.FOLLOW.isEnabled) {
+                    FollowListLauncher.launch(context)
+                } else {
+                    selectedTab = tab
+                }
             },
             modifier =
                 Modifier
@@ -84,7 +92,6 @@ fun HomeScreen(
                     shouldRefresh = shouldRefresh
                 )
 //                HomeTabItem.GROUP_BUY -> DisabledTabContent("团购")
-//                HomeTabItem.FOLLOW -> DisabledTabContent("关注")
 //                HomeTabItem.RECOMMEND -> DisabledTabContent("推荐")
                 else -> DisabledTabContent("暂未开发")
             }

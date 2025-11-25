@@ -2,6 +2,7 @@ package com.bytedance.croissantapp.presentation.detail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -45,7 +46,7 @@ fun DetailScreen(
                         title = { Text("作品详情") },
                         navigationIcon = {
                             IconButton(onClick = onNavigateBack) {
-                                Icon(Icons.Default.ArrowBack, "返回")
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回")
                             }
                         }
                     )

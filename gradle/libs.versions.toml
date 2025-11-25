@@ -56,6 +56,7 @@ composeMaterial = "1.6.0"
 
 # Compose Foundation (for LazyVerticalStaggeredGrid)
 composeFoundation = "1.6.0"
+appcompat = "1.7.1"
 
 [libraries]
 # AndroidX Core
@@ -133,6 +134,7 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
