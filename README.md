@@ -722,4 +722,317 @@ LazyVerticalStaggeredGrid(
 └──────────────────────────────────────────────┘
 ```
 ---
+
+## 3. 详情页功能实现
+
 ### 3.1 DetailScreen实现
+
+#### 导航流程
+DetailScreen通过Jetpack Navigation组件实现页面导航，整体流程如下：
+
+**导航路由定义**
+- 使用带参数的路由模板 `detail/{postId}` 接收动态的帖子ID
+
+**从HomeScreen触发导航**
+- 用户点击帖子卡片组件PostCard时触发onClick回调
+- 回调函数调用 `onNavigateToDetail(post.postId)` 传递帖子ID
+- 该回调函数在NavGraph中定义为 `navController.navigate(Routes.detail(postId))`
+- Navigation组件根据路由字符串跳转到DetailScreen，并将postId作为参数传递
+
+**DetailScreen参数接收**
+- NavGraph的composable块从backStackEntry中提取postId参数
+- 将postId传递给DetailScreen composable函数
+
+**返回导航处理**
+- DetailScreen提供onNavigateBack回调函数
+- 返回前通过savedStateHandle设置刷新标记 `refresh_from_detail = true`
+- 调用 `navController.navigateUp()` 执行返回操作
+- HomeScreen监听该标记实现数据刷新（从详情页返回时重新加载本地状态）
+
+#### 页面结构
+DetailScreen采用Scaffold布局模式，将页面分为三个核心区域：
+
+**顶部栏 (TopBar)**
+- 成功加载状态显示DetailTopBar组件，包含作者信息和关注按钮
+- 加载中或错误状态显示简化版TopAppBar，仅包含返回按钮和标题
+- TopBar接收Post对象、返回回调和关注回调三个参数
+
+**底部栏 (BottomBar)**
+- 仅在成功加载状态显示DetailBottomBar组件
+- 包含评论输入框、点赞按钮、评论/收藏/分享按钮
+- 接收Post对象和点赞回调参数
+
+**内容区域 (Content)**
+- 根据uiState的三种状态显示不同UI：
+  - **Loading状态**：屏幕中央显示CircularProgressIndicator加载动画
+  - **Success状态**：显示DetailContent组件，传入post对象和padding值
+  - **Error状态**：显示错误信息和重试按钮，点击重试重新调用loadPostDetail
+
+#### 异步数据加载机制
+DetailScreen使用LaunchedEffect实现数据加载的生命周期管理：
+
+**LaunchedEffect触发时机**
+- 以postId作为key参数，当postId变化时重新执行
+- 在Composable首次组合时自动触发
+- 调用 `viewModel.loadPostDetail(postId)` 启动异步加载
+
+**状态流订阅**
+- 使用 `collectAsState()` 订阅ViewModel的uiState状态流
+- 状态变化时自动触发UI重组
+- by关键字实现自动解包State对象
+
+**数据流示意**：
+```
+用户点击HomeScreen的PostCard
+    ↓
+NavController导航到DetailScreen(postId)
+    ↓
+LaunchedEffect触发 → viewModel.loadPostDetail(postId)
+    ↓
+ViewModel更新uiState: Loading → Success/Error
+    ↓
+DetailScreen观察到状态变化，重组UI显示对应内容
+```
+
+---
+
+### 3.2 DetailViewModel实现
+
+#### loadPostDetail方法逻辑
+
+**方法职责**
+- 接收postId参数作为查询标识
+- 使用viewModelScope.launch启动协程，确保生命周期安全
+
+**状态转换流程**
+
+**1. 初始化Loading状态**
+   - 首先设置 `_uiState.value = DetailUiState.Loading`
+   - 触发UI显示加载动画
+
+**2. 调用UseCase获取数据**
+   - 调用 `getPostDetailUseCase(postId)` 执行数据获取逻辑
+   - UseCase内部优先从Room数据库读取缓存
+
+**3. 本地状态填充**
+
+**4. 更新成功状态**
+   - 设置 `_uiState.value = DetailUiState.Success(enrichedPost)`
+   - 触发UI显示详情内容
+
+
+#### 数据来源说明
+
+**当前实现的数据源层级**：
+```
+DetailViewModel.loadPostDetail(postId)
+    ↓
+GetPostDetailUseCase(postId)
+    ├─ [优先] feedRepository.getCachedPost(postId)  // 从Room数据库查询
+    │           └─ 命中缓存 → 直接返回Post对象
+    │
+    └─ [降级] feedRepository.getFeed()      // 缓存未命中时调用API
+```
+
+**状态填充的数据源**：
+- `isLiked` 和 `likeCount`：从SharedPreferences读取（key: `like_status_{postId}`）
+- `author.isFollowed`：从SharedPreferences读取（key: `follow_status_{userId}`）
+- 其他字段（title/content/clips等）：来自Room数据库或API响应
+
+#### 用户交互处理
+
+**toggleLike方法**
+- 获取当前Success状态下的Post对象
+- 切换点赞状态：`newLikedStatus = !post.isLiked`
+- 更新点赞数：点赞+1，取消点赞-1（最小为0）
+- 立即更新SharedPreferences持久化存储
+- 使用copy创建新Post对象，更新UI状态
+
+**toggleFollow方法**
+- 获取当前Success状态下的Author对象
+- 切换关注状态：`newFollowStatus = !author.isFollowed`
+- 立即更新SharedPreferences存储关注状态
+- 在后台IO线程同步更新Room数据库：
+  - 关注：插入FollowedUserEntity记录
+  - 取关：删除对应的FollowedUserEntity记录
+- 使用copy创建新Post对象，更新UI状态
+
+---
+
+### 3.3 DetailContent实现
+
+DetailContent负责展示帖子的核心内容，采用纵向滚动的布局结构。
+
+#### 整体布局结构
+
+**外层容器**
+- 使用Column作为主容器，设置fillMaxSize填充可用空间
+- 添加verticalScroll修饰符，使整个内容区域可上下滚动
+- 滚动状态由rememberScrollState()管理
+
+**布局层次**（从上到下）：
+1. **横滑媒体区域**：ImagePagerSection组件显示图片/视频轮播
+2. **内容区域**：包裹在带水平padding的Column中
+   - 标题区域：显示post.title，使用MaterialTheme.typography.titleLarge样式
+   - 正文区域：HashtagText组件显示带话题高亮的内容
+   - 时间区域：显示格式化的发布时间
+3. **底部留白**：Spacer高度80dp，避免内容被BottomBar遮挡
+
+#### 横滑图片容器实现（ImagePagerSection）
+
+**HorizontalPager核心配置**
+
+**状态管理**
+- 使用 `rememberPagerState(pageCount = { clips.size })` 创建分页状态
+- pageCount为lambda形式，支持动态更新图片数量
+- pagerState跟踪当前页索引（currentPage）
+
+**宽高比适配**
+- 读取第一张图片的 `displayAspectRatio` 属性
+- 使用 `aspectRatio(ratio)` 修饰符设置容器宽高比
+- 确保不同尺寸图片显示时容器高度自适应
+
+**分页内容渲染**
+- HorizontalPager的content lambda接收page参数（当前页索引）
+- 根据 `clips[page].type` 判断媒体类型：
+  - **ClipType.IMAGE**：使用SubcomposeAsyncImage加载图片
+    - model参数为图片URL
+    - contentScale设置为Crop实现居中裁剪
+    - loading状态显示CircularProgressIndicator
+    - error状态显示"加载失败"文本
+  - **ClipType.VIDEO**：调用VideoPlayerView组件（当前为占位实现）
+
+**进度指示器**
+- 仅在图片数量大于1时显示
+- 使用LinearProgressIndicator展示浏览进度
+- 进度计算公式：`(currentPage + 1) / totalPages`
+- 高度设置为2dp的细线样式
+
+#### 话题高亮文本实现（HashtagText）
+
+**AnnotatedString构建逻辑**
+
+**数据预处理**
+- 将hashtags列表按start位置升序排序
+- 确保从左到右依次处理话题词
+
+**字符串分段拼接**
+- 遍历排序后的hashtags列表
+- 对于每个hashtag：
+  1. 先添加话题词之前的普通文本
+  2. 使用pushStringAnnotation标记话题词区域（tag="HASHTAG"）
+  3. 使用withStyle应用蓝色加粗样式（Color(0xFF1E90FF)）
+  4. 添加话题词文本
+  5. 调用pop()结束标注
+  6. 更新lastIndex为hashtag.end
+- 循环结束后添加最后的普通文本
+---
+
+### 3.4 DetailTopBar和DetailBottomBar实现
+
+#### DetailTopBar组件功能
+
+**布局结构**
+
+DetailTopBar基于Material3的TopAppBar组件实现，包含三个核心区域：
+
+**导航图标区域**
+- 显示返回箭头图标（ArrowBack）
+- 点击触发onNavigateBack回调，执行返回导航
+- 使用IconButton包裹确保触摸区域足够大
+
+**标题区域**
+- 使用Row水平排列作者信息和关注按钮
+- **作者头像**：
+  - SubcomposeAsyncImage异步加载头像图片
+  - 尺寸32dp，使用CircleShape裁剪为圆形
+  - contentScale设置为Crop确保填充
+- **作者昵称**：
+  - 显示post.author.nickname
+  - 使用titleMedium样式
+- **关注按钮**：
+  - OutlinedButton实现空心按钮样式
+  - 根据isFollowed状态动态切换：
+    - 已关注：灰色边框 + 灰色文字 + "已关注"文本
+    - 未关注：红色边框 + 红色文字 + "关注"文本
+  - 高度32dp，水平padding 8dp保持紧凑
+  - 点击触发onFollowClick回调执行关注/取关操作
+
+**样式配置**
+- 背景色设置为纯白色（containerColor = Color.White）
+- 无阴影效果，保持扁平设计
+
+#### DetailBottomBar组件功能
+
+**布局结构**
+
+DetailBottomBar使用Surface容器实现底部工具栏，shadowElevation设置为8dp产生悬浮效果。
+
+**快捷评论框**
+- OutlinedTextField组件实现圆角输入框
+- placeholder显示"说点什么..."提示文本
+- **当前限制**：enabled设置为false禁用输入功能
+- 原因：评论功能暂未实现，仅作为占位UI
+- shape设置为RoundedCornerShape(20dp)实现胶囊形状
+- 权重weight(1f)使其占据剩余空间
+
+**点赞按钮**
+- IconButton包裹Icon和Text的组合
+- **图标切换逻辑**：
+  - 已点赞：实心红心图标（Favorite）+ 红色
+  - 未点赞：空心红心图标（FavoriteBorder）+ 灰色
+- **数字显示**：
+  - 调用formatCount函数格式化点赞数
+  - 1万以上显示为"1.0w"格式（如15000 → 1.5w）
+  - 颜色与图标保持一致
+- 点击触发onLikeClick回调执行点赞/取消点赞
+
+**评论按钮**
+- 显示邮件图标（MailOutline）
+- 灰色占位状态
+- onClick回调为空实现（TODO标记）
+
+**收藏按钮**
+- 显示加号圆圈图标（AddCircle）
+- 灰色占位状态
+- 功能待实现
+
+**分享按钮**
+- 显示分享图标（Share）
+- 当前实现仅打印日志
+- 预留系统分享功能接入点
+
+**工具函数formatCount**
+- 接收Int类型的count参数
+- 判断逻辑：
+  - count >= 10000：返回格式化字符串保留1位小数（如15678 → "1.6w"）
+  - count < 10000：直接返回toString()（如123 → "123"）
+
+---
+
+## 4. 问题
+
+### 当前存在的设计问题
+
+#### 问题1: 用户操作缺少API调用
+- **现象**：toggleLike和toggleFollow方法只更新本地存储（SharedPreferences和Room），没有调用后端API 加载PostScreen时使用本地数据库
+- **后果**：
+  - 用户的点赞/关注操作完全不会同步到服务器
+  - 换设备登录后所有操作记录丢失
+  - 无法实现跨端数据同步
+  - 其他用户看不到你的点赞/关注
+
+#### 问题2: 数据永不失效
+- **现象**：Room数据库缓存没有TTL（Time-To-Live）机制
+- **后果**：
+  - 用户看到的点赞数可能是1小时前/1天前的旧数据
+  - 作者的个人简介更新后，应用中永远显示旧版本
+  - 用户头像更换后，应用中仍显示旧头像
+
+
+#### 问题3: 缺少离线优先（Offline-First）策略
+- **现象**：网络失败时用户操作直接丢失，没有操作队列/重试机制
+- **后果**：
+  - 用户在地铁中（无网络）点赞5条帖子，UI显示已点赞，但从未同步到服务器
+  - 切换到WiFi后也不会自动同步
+  - 用户以为已点赞，但服务器无记录

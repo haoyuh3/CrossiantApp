@@ -70,14 +70,20 @@ fun PostCard(
 
                         ClipType.VIDEO -> {
                             // 视频封面 + 播放按钮
-                            println("cover clip type: ${coverClip.type}")
-                            println("cover clip title: ${coverClip.url}")
+                            println("video url: ${coverClip.url}")
                             VideoPlayer(
                                 videoUrl = coverClip.url,
                                 autoPlay = false,  // 首页不自动播放
                                 showControls = false,  // 不显示控制条
                                 modifier = Modifier.fillMaxSize()
                             )
+//                            AsyncImage(
+//                                // TODO NEED Video Cover
+//                                model = coverClip.url,
+//                                contentDescription = null,
+//                                modifier = Modifier.fillMaxSize(),
+//                                contentScale = ContentScale.Crop
+//                            )
 
                             // 播放图标遮罩
                             Box(

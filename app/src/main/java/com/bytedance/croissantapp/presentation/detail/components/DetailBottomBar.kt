@@ -89,7 +89,6 @@ fun DetailBottomBar(
 
             // 分享按钮
             IconButton(onClick = {
-                // TODO: 实现分享功能
                 println("分享作品: ${post.postId}")
             }) {
                 Icon(
