@@ -36,29 +36,23 @@ class DetailViewModel @Inject constructor(
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
     /**
-     * 加载作品详情
+     * 直接设置 Post 对象
      */
-    fun loadPostDetail(postId: String) {
-        viewModelScope.launch {
-            _uiState.value = DetailUiState.Loading
+    fun setInitialPost(post: Post) {
+        try {
+            // 填充本地状态（点赞、关注）
+            val enrichedPost = post.copy(
+                isLiked = preferencesRepository.getLikeStatus(post.postId),
+                author = post.author.copy(
+                    isFollowed = preferencesRepository.getFollowStatus(post.author.userId)
+                ),
+                likeCount = preferencesRepository.getLikeCount(post.postId),
+            )
 
-            try {
-                // 从UseCase获取作品数据
-                val post = getPostDetailUseCase(postId)
-
-                // 填充本地状态（点赞、关注）
-                val enrichedPost = post.copy(
-                    isLiked = preferencesRepository.getLikeStatus(postId),
-                    author = post.author.copy(
-                        isFollowed = preferencesRepository.getFollowStatus(post.author.userId)
-                    ),
-                    likeCount = preferencesRepository.getLikeCount(postId),
-                )
-
-                _uiState.value = DetailUiState.Success(enrichedPost)
-            } catch (e: Exception) {
-                _uiState.value = DetailUiState.Error(e.message ?: "加载失败")
-            }
+            _uiState.value = DetailUiState.Success(enrichedPost)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _uiState.value = DetailUiState.Error(e.message ?: "设置失败")
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.bytedance.croissantapp.domain.model.Post
 import com.bytedance.croissantapp.presentation.detail.DetailScreen
 import com.bytedance.croissantapp.presentation.home.HomeScreen
 import com.bytedance.croissantapp.presentation.profile.ProfileScreen
@@ -47,9 +48,14 @@ fun NavGraph(
                 .getStateFlow("refresh_from_detail", false)
 
             HomeScreen(
-                onNavigateToDetail = { postId ->
+                onNavigateToDetail = { post ->
                     // 跳转到详情页
-                    navController.navigate(Routes.detail(postId))
+                    navController.navigate(Routes.detail(post.postId))
+
+                    // Post 对象存入详情页的 SavedStateHandle
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selected_post", post)
                 },
                 shouldRefresh = shouldRefresh
             )
@@ -63,10 +69,14 @@ fun NavGraph(
         // 详情页
         composable(route = Routes.DETAIL) { backStackEntry ->
             // 获取路由参数
-            val postId = backStackEntry.arguments?.getString("postId")
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+
+            // 从当前页的 SavedStateHandle 获取传递的 Post 对象
+            val post = backStackEntry.savedStateHandle.get<Post>("selected_post")
 
             DetailScreen(
-                postId = postId ?: "",
+                postId = postId,
+                initialPost = post,  // 传递 Post 对象
                 onNavigateBack = {
                     // 返回前设置刷新信号（在动画开始前立即触发）
                     navController.previousBackStackEntry

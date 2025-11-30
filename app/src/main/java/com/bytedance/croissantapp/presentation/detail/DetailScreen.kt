@@ -3,13 +3,13 @@ package com.bytedance.croissantapp.presentation.detail
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bytedance.croissantapp.domain.model.Post
 import com.bytedance.croissantapp.presentation.detail.components.DetailTopBar
 import com.bytedance.croissantapp.presentation.detail.components.DetailBottomBar
 import com.bytedance.croissantapp.presentation.detail.components.DetailContent
@@ -19,12 +19,17 @@ import com.bytedance.croissantapp.presentation.detail.components.DetailContent
 fun DetailScreen(
     modifier: Modifier = Modifier,
     postId: String,
+    initialPost: Post? = null,
     onNavigateBack: () -> Unit,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     // 加载作品详情
-    LaunchedEffect(postId) {
-        viewModel.loadPostDetail(postId)
+    LaunchedEffect(postId, initialPost) {
+        if (initialPost != null) {
+            viewModel.setInitialPost(initialPost)
+        } else {
+            println("错误: Post对象不存在")
+        }
     }
 
     // 观察UI状态
@@ -91,7 +96,7 @@ fun DetailScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("加载失败: ${state.message}")
                         Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { viewModel.loadPostDetail(postId) }) {
+                        Button(onClick = {}) {
                             Text("重试")
                         }
                     }

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bytedance.croissantapp.domain.model.Post
 import com.bytedance.croissantapp.presentation.follow.FollowListLauncher
 import com.bytedance.croissantapp.presentation.home.components.HomeTabRow
 import com.bytedance.croissantapp.presentation.home.components.PostCard
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * 首页主界面
  *
- * @param onNavigateToDetail 跳转到详情页的回调 返回 postID 用于锁定详情页
+ * @param onNavigateToDetail 跳转到详情页的回调 传递 Post 对象
  * @param modifier 修饰符
  * @param viewModel
  * @note viewModel:
@@ -39,7 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 @Composable
 fun HomeScreen(
-    onNavigateToDetail: (String) -> Unit,
+    onNavigateToDetail: (Post) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     shouldRefresh: StateFlow<Boolean>? = null
@@ -105,7 +106,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CommunityTabContent(
-    onNavigateToDetail: (String) -> Unit,
+    onNavigateToDetail: (Post) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     shouldRefresh: StateFlow<Boolean>? = null
@@ -179,7 +180,7 @@ private fun CommunityTabContent(
                     ) { post ->
                         PostCard(
                             post = post,
-                            onClick = { onNavigateToDetail(post.postId) },
+                            onClick = { onNavigateToDetail(post) },
                             onLikeClick = { viewModel.toggleLike(post.postId) }
                         )
                     }
