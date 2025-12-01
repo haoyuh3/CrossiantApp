@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.bytedance.croissantapp.domain.model.ClipType
 import com.bytedance.croissantapp.domain.model.Post
-import com.bytedance.croissantapp.presentation.components.VideoPlayer
 import androidx.compose.foundation.background
 import com.bytedance.croissantapp.util.LikeCntUtil
 
@@ -82,7 +81,6 @@ fun PostCard(
                                     .background(Color.Black), // 添加黑色背景
                                 contentAlignment = Alignment.Center //
                             ) {
-                                // 3. 将原来的Column直接放在这里
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {

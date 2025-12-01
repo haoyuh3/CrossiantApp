@@ -117,7 +117,6 @@ public class FollowListAdapter extends RecyclerView.Adapter<FollowListAdapter.Fo
 
             // 设置整个item的点击事件（可以跳转到用户详情页）
             itemView.setOnClickListener(v -> {
-                // TODO: 跳转到用户详情页
             });
         }
 

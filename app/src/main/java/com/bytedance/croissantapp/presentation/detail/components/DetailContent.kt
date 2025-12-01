@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,7 +15,6 @@ import com.bytedance.croissantapp.domain.model.Post
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.buildAnnotatedString
@@ -24,6 +22,7 @@ import com.bytedance.croissantapp.domain.model.Clip
 import com.bytedance.croissantapp.domain.model.Hashtag
 import coil.compose.SubcomposeAsyncImage
 import com.bytedance.croissantapp.domain.model.ClipType
+import com.bytedance.croissantapp.presentation.components.VideoPlayer
 import com.bytedance.croissantapp.util.DateUtil
 
 @Composable
@@ -59,7 +58,6 @@ fun DetailContent(
                 content = post.content,
                 hashtags = post.hashtags,
                 onHashtagClick = { hashtag ->
-                    // TODO: 跳转到话题页
                     println("点击话题: $hashtag")
                 }
             )
@@ -129,8 +127,11 @@ fun ImagePagerSection(
                     )
                 }
                 ClipType.VIDEO -> {
-                    // 视频展示（进阶功能）
-                    VideoPlayerView(clip = clip)
+                    VideoPlayer(
+                                videoUrl = clip.url,
+                                autoPlay = false,  // 首页不自动播放
+                                modifier = Modifier.fillMaxSize()
+                            )
                 }
             }
         }
@@ -212,37 +213,4 @@ fun HashtagText(
         },
         modifier = modifier
     )
-}
-
-/**
- * 视频播放器占位组件（进阶功能）
- * TODO: 使用ExoPlayer实现视频播放
- */
-@Composable
-fun VideoPlayerView(
-    clip: Clip,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = "视频",
-                modifier = Modifier.size(64.dp),
-                tint = Color.Gray
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "视频播放功能开发中",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-        }
-    }
 }

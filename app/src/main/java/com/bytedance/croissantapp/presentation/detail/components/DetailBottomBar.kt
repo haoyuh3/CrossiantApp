@@ -70,7 +70,7 @@ fun DetailBottomBar(
             }
 
             // 评论按钮（占位）
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.Default.MailOutline,
                     contentDescription = "评论",
@@ -79,7 +79,7 @@ fun DetailBottomBar(
             }
 
             // 收藏按钮（占位）
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
                     contentDescription = "收藏",

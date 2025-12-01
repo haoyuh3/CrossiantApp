@@ -87,7 +87,7 @@ class HomeViewModel @Inject constructor(
                 onFailure = { error ->
                     println("HomeViewModel: 网络加载失败 - ${error.message}，尝试从缓存加载")
                     // 网络失败时尝试从缓存加载
-                    val cachedPosts = getFeedUseCaseCache(count = 20)
+                    val cachedPosts = getFeedUseCaseCache()
                     println("HomeViewModel: 从缓存获取到 ${cachedPosts.size} 条数据")
 
                     if (cachedPosts.isNotEmpty()) {
