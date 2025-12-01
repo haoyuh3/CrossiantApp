@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.bytedance.croissantapp.domain.repository.FeedRepository
 
 /**
  * Feed UI状态
@@ -32,6 +33,7 @@ sealed class FeedUiState {
 class HomeViewModel @Inject constructor(
     private val getFeedUseCase: GetFeedUseCase,
     private val preferencesRepository: UserPreferencesRepository,
+    private val feedRepository: FeedRepository,
     private val getFeedUseCaseCache: GetFeedUseCaseCache
 ) : ViewModel() {
 
@@ -82,6 +84,11 @@ class HomeViewModel @Inject constructor(
                     } else {
                         println("HomeViewModel: 加载成功，共 ${postsWithLocalState.size} 条")
                         FeedUiState.Success
+                    }
+                    // 首屏缓存：清空旧数据并插入新数据
+                    if (posts.isNotEmpty()) {
+                        feedRepository.replaceCachedPosts(posts)
+                        println("HomeViewModel: 已清空旧缓存并插入 ${posts.size} 条新数据")
                     }
                 },
                 onFailure = { error ->

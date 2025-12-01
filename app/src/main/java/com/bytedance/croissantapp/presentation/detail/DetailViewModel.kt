@@ -26,7 +26,6 @@ sealed class DetailUiState {
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val getPostDetailUseCase: GetPostDetailUseCase,
     private val preferencesRepository: UserPreferencesRepository,
     private val followedUserDao: FollowedUserDao
 ) : ViewModel() {

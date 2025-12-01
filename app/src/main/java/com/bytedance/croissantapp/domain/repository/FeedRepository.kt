@@ -16,8 +16,7 @@ interface FeedRepository {
      */
     suspend fun getCachedPost(postId: String): Post?
 
-    /**
-     * 从缓存中随机获取指定数量的Post
-     */
     suspend fun getLatestCachedPosts(count: Int): List<Post>
+
+    suspend fun replaceCachedPosts(posts: List<Post>)
 }

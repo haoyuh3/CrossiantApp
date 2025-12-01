@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 import com.bytedance.croissantapp.data.local.entity.PostEntity;
 
@@ -26,4 +27,13 @@ public interface PostDao {
 
     @Query("SELECT * FROM posts ORDER BY create_time DESC LIMIT :count")
     List<PostEntity> getLatestPosts(int count);
+
+    /**
+     * 清空表并插入新数据（原子操作）
+     */
+    @Transaction
+    default void replaceAll(List<PostEntity> posts) {
+        deleteAll();
+        insert(posts);
+    }
 }

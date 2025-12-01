@@ -49,15 +49,7 @@ class FeedRepositoryImpl @Inject constructor(
                         continue // 转换失败也跳过
                     }
                 }
-
-                if (posts.isNotEmpty()) {
-                    // 将 Post 转换为 PostEntity 后插入数据库
-                    withContext(Dispatchers.IO) {
-                        postDao.insert(posts.toEntityList())
-                    }
-                    println("FeedRepository: 成功转换并向数据库插入 ${posts.size} 条数据")
-                }
-                println("FeedRepository: 成功转换 ${posts.size} 条有效数据，已缓存")
+                println("FeedRepository: 成功转换 ${posts.size} 条有效数据")
                 Result.success(posts)
             } else {
                 println("FeedRepository: API返回错误 - statusCode=${response.statusCode}")
@@ -80,6 +72,12 @@ class FeedRepositoryImpl @Inject constructor(
     override suspend fun getLatestCachedPosts(count: Int): List<Post> {
         return withContext(Dispatchers.IO) {
             postDao.getLatestPosts(count)?.map { it.toDomain() } ?: emptyList()
+        }
+    }
+
+    override suspend fun replaceCachedPosts(posts: List<Post>) {
+        return withContext(Dispatchers.IO) {
+            postDao.replaceAll(posts.toEntityList())
         }
     }
 }
