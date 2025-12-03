@@ -28,7 +28,8 @@ import com.bytedance.croissantapp.util.DateUtil
 @Composable
 fun DetailContent(
     post: Post,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onHashtagClick: (String) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -58,7 +59,7 @@ fun DetailContent(
                 content = post.content,
                 hashtags = post.hashtags,
                 onHashtagClick = { hashtag ->
-                    println("点击话题: $hashtag")
+                    onHashtagClick(hashtag)
                 }
             )
 

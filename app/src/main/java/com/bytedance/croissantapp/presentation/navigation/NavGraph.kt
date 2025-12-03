@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.bytedance.croissantapp.domain.model.Post
 import com.bytedance.croissantapp.presentation.detail.DetailScreen
+import com.bytedance.croissantapp.presentation.hashtag.HashtagScreen
 import com.bytedance.croissantapp.presentation.home.HomeScreen
 import com.bytedance.croissantapp.presentation.profile.ProfileScreen
 
@@ -18,8 +19,13 @@ object Routes {
     const val PROFILE = "profile"
     const val DETAIL = "detail/{postId}" // 详情页，带参数
 
+    const val HASHTAG ="hashtag/{hashtag}"
+
+
     // 生成详情页路由的辅助函数
     fun detail(postId: String) = "detail/$postId"
+    // 话题页路由
+    fun hashtag(hashtag: String) = "hashtag/$hashtag"
 }
 
 /**
@@ -84,8 +90,25 @@ fun NavGraph(
                         ?.set("refresh_from_detail", true)
 
                     navController.navigateUp()
+                },
+                onHashtagClick = { hashtag ->
+                    val encoded = java.net.URLEncoder.encode(hashtag, "UTF-8")
+                    navController.navigate(Routes.hashtag(encoded))
                 }
+
             )
         }
+
+        composable(route = Routes.HASHTAG) { backStackEntry ->
+            val hashtag = java.net.URLDecoder.decode(
+                backStackEntry.arguments?.getString("hashtag") ?: "",
+                "UTF-8")
+
+            HashtagScreen(
+                hashtag = hashtag,
+                onNavigateBack = { navController.navigateUp() },
+            )
+        }
+
     }
 }

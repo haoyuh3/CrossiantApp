@@ -21,6 +21,7 @@ fun DetailScreen(
     postId: String,
     initialPost: Post? = null,
     onNavigateBack: () -> Unit,
+    onHashtagClick: (String) -> Unit,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     // 加载作品详情
@@ -83,7 +84,8 @@ fun DetailScreen(
             is DetailUiState.Success -> {
                 DetailContent(
                     post = state.post,
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(paddingValues),
+                    onHashtagClick = onHashtagClick
                 )
             }
             is DetailUiState.Error -> {
