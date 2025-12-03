@@ -25,11 +25,11 @@ public interface PostDao {
     @Query("DELETE FROM posts")
     void deleteAll();
 
-    @Query("SELECT * FROM posts ORDER BY create_time DESC LIMIT :count")
+    @Query("SELECT * FROM posts LIMIT :count")
     List<PostEntity> getLatestPosts(int count);
 
     /**
-     * 清空表并插入新数据（原子操作）
+     * 清空表并插入新数据
      */
     @Transaction
     default void replaceAll(List<PostEntity> posts) {

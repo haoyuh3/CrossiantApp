@@ -23,18 +23,15 @@ public class FollowListAdapter extends RecyclerView.Adapter<FollowListAdapter.Fo
 
     private List<FollowUser> userList;
     private OnFollowClickListener followClickListener;
-
+    public FollowListAdapter() {
+        this.userList = new ArrayList<>();
+    }
     /**
      * 关注按钮点击回调接口
      */
     public interface OnFollowClickListener {
         void onFollowClick(FollowUser user, int position);
     }
-
-    public FollowListAdapter() {
-        this.userList = new ArrayList<>();
-    }
-
     public void setFollowClickListener(OnFollowClickListener listener) {
         this.followClickListener = listener;
     }

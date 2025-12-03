@@ -102,6 +102,9 @@ class HomeViewModel @Inject constructor(
                         _posts.value = postsWithLocalState
                         _uiState.value = FeedUiState.Success
                         println("HomeViewModel: 使用缓存数据，共 ${postsWithLocalState.size} 条")
+                        for (post in postsWithLocalState) {
+                            println("HomeViewModel: 缓存数据 - postId=${post.postId}, postTitle = ${post.title}")
+                        }
                     } else {
                         _posts.value = emptyList()
                         _uiState.value = FeedUiState.Error("网络连接失败，且无缓存数据")
