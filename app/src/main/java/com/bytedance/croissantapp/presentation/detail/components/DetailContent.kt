@@ -1,5 +1,11 @@
 package com.bytedance.croissantapp.presentation.detail.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,9 +31,12 @@ import com.bytedance.croissantapp.domain.model.ClipType
 import com.bytedance.croissantapp.presentation.components.VideoPlayer
 import com.bytedance.croissantapp.util.DateUtil
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun DetailContent(
     post: Post,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
     onHashtagClick: (String) -> Unit
 ) {
@@ -37,10 +46,24 @@ fun DetailContent(
             .verticalScroll(rememberScrollState()) // 内容部分可以滑动
     ) {
         // 横滑图片容器
-        ImagePagerSection(clips = post.clips)
+        ImagePagerSection(
+            clips = post.clips,
+            postId = post.postId,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope
+        )
 
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp) // 只应用水平 padding
+            modifier = Modifier
+                .padding(horizontal = 16.dp) // 只应用水平 padding
+                .then(
+                    with(animatedVisibilityScope) {
+                        Modifier.animateEnterExit(
+                            enter = fadeIn(),
+                            exit = fadeOut()
+                        )
+                    }
+                )
         ){
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -79,9 +102,13 @@ fun DetailContent(
 }
 
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ImagePagerSection(
     clips: List<Clip>,
+    postId: String,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
 ) {
     if (clips.isEmpty()) return
@@ -98,6 +125,14 @@ fun ImagePagerSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(aspectRatio)
+                .then(
+                    with(sharedTransitionScope) {
+                        Modifier.sharedBounds(
+                            sharedContentState = rememberSharedContentState(key = "post-image-$postId"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                    }
+                )
         ) { page ->
             val clip = clips[page]
 

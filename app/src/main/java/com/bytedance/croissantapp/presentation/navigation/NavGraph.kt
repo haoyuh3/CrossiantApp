@@ -1,5 +1,7 @@
 package com.bytedance.croissantapp.presentation.navigation
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -34,26 +36,33 @@ object Routes {
  * @param navController 导航控制器
  * @param startDestination 起始目的地
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = Routes.HOME,
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = modifier,
-    ) {
+    // SharedTransitionLayout 共享专场容器
+    // 共享元素动画使用默认值
+    // 位置： 从卡片位置平滑移动到详情页位置
+    // 大小： 从卡片尺寸平滑缩放到详情页尺寸
+    SharedTransitionLayout {
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = modifier,
+        ) {
         // 首页
-        composable(route = Routes.HOME) {
-            backStackEntry ->
+        composable(route = Routes.HOME) { backStackEntry ->
             // 监听从详情页返回的结果
             val shouldRefresh = backStackEntry
                 .savedStateHandle
                 .getStateFlow("refresh_from_detail", false)
 
             HomeScreen(
+                sharedTransitionScope = this@SharedTransitionLayout, // 共享容器
+                animatedVisibilityScope = this@composable, // 动画可见性作用域
                 onNavigateToDetail = { post ->
                     // 跳转到详情页
                     navController.navigate(Routes.detail(post.postId))
@@ -81,6 +90,8 @@ fun NavGraph(
             val post = backStackEntry.savedStateHandle.get<Post>("selected_post")
 
             DetailScreen(
+                sharedTransitionScope = this@SharedTransitionLayout,
+                animatedVisibilityScope = this@composable,
                 postId = postId,
                 initialPost = post,  // 传递 Post 对象
                 onNavigateBack = {
@@ -110,5 +121,6 @@ fun NavGraph(
             )
         }
 
+        }
     }
 }

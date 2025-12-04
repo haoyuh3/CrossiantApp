@@ -1,11 +1,15 @@
 package com.bytedance.croissantapp.presentation.home
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -17,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,6 +35,8 @@ import kotlinx.coroutines.flow.StateFlow
  * 首页主界面
  *
  * @param onNavigateToDetail 跳转到详情页的回调 传递 Post 对象
+ * @param sharedTransitionScope 共享转场作用域
+ * @param animatedVisibilityScope 动画可见性作用域
  * @param modifier 修饰符
  * @param viewModel
  * @note viewModel:
@@ -38,8 +45,11 @@ import kotlinx.coroutines.flow.StateFlow
  * 响应 View 的事件：当用户在 View 上进行操作时（例如下拉刷新、点击按钮），View 会通知 ViewModel，由 ViewModel 来决定下一步该做什么（比如重新请求网络）。◦
  * 持有并管理 UI 状态：它保存着界面的状态（比如列表数据、加载状态、错误信息），并且这些状态在屏幕旋转等配置变更后依然能够存活，不会丢失。
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onNavigateToDetail: (Post) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -88,6 +98,8 @@ fun HomeScreen(
         ) {
             when (selectedTab) {
                 HomeTabItem.COMMUNITY -> CommunityTabContent(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
                     onNavigateToDetail = onNavigateToDetail,
                     viewModel = viewModel,
                     shouldRefresh = shouldRefresh
@@ -103,9 +115,11 @@ fun HomeScreen(
 /**
  * 社区Tab内容（默认Tab）- 双列瀑布流
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 private fun CommunityTabContent(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onNavigateToDetail: (Post) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -181,7 +195,9 @@ private fun CommunityTabContent(
                         PostCard(
                             post = post,
                             onClick = { onNavigateToDetail(post) },
-                            onLikeClick = { viewModel.toggleLike(post.postId) }
+                            onLikeClick = { viewModel.toggleLike(post.postId) },
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope
                         )
                     }
 
@@ -242,7 +258,25 @@ private fun CommunityTabContent(
         // Snackbar 提示
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier.align(Alignment.Center),
+            snackbar = { snackbarData ->
+                // 自定义 Snackbar 的外观
+                Snackbar(
+                    modifier = Modifier
+                        .width(280.dp) // 宽度
+                        .padding(horizontal = 16.dp), // 内边距
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface
+                ) {
+                    // 使用 Text 组件并使其居中
+                    Text(
+                        text = snackbarData.visuals.message,
+                        modifier = Modifier.fillMaxWidth(), // 文字居中
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         )
     }
 }

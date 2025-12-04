@@ -1,5 +1,8 @@
 package com.bytedance.croissantapp.presentation.detail
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,9 +17,11 @@ import com.bytedance.croissantapp.presentation.detail.components.DetailTopBar
 import com.bytedance.croissantapp.presentation.detail.components.DetailBottomBar
 import com.bytedance.croissantapp.presentation.detail.components.DetailContent
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun DetailScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
     postId: String,
     initialPost: Post? = null,
@@ -84,6 +89,8 @@ fun DetailScreen(
             is DetailUiState.Success -> {
                 DetailContent(
                     post = state.post,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
                     modifier = Modifier.padding(paddingValues),
                     onHashtagClick = onHashtagClick
                 )

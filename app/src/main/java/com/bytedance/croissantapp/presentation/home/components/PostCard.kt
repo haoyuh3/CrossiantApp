@@ -1,5 +1,8 @@
 package com.bytedance.croissantapp.presentation.home.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -29,13 +32,18 @@ import com.bytedance.croissantapp.util.LikeCntUtil
  * @param post 作品数据
  * @param onClick 点击卡片回调
  * @param onLikeClick 点击点赞按钮回调
+ * @param sharedTransitionScope 共享转场作用域
+ * @param animatedVisibilityScope 动画可见性作用域
  * @param modifier 修饰符
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PostCard(
     post: Post,
     onClick: () -> Unit,
     onLikeClick: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -55,6 +63,14 @@ fun PostCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(coverClip.displayAspectRatio)
+                        .then(
+                            with(sharedTransitionScope) {
+                                Modifier.sharedBounds(
+                                    sharedContentState = rememberSharedContentState(key = "post-image-${post.postId}"),
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                            }
+                        )
                 ) {
                     when (coverClip.type) {
                         ClipType.IMAGE -> {
