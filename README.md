@@ -78,14 +78,15 @@ Croissant是一个基于字节跳动训练营课题的**UGC内容社区客户端
 
 #### 自由探索完成度
 
-| 思考方向 | 完成状态 | 实现位置 | 说明                       |
-|---------|---------|----------|--------------------------|
-| **体验优化** | ✅ 已完成 | 多处优化 | -                        |
+| 思考方向 | 完成状态 | 实现位置                    | 说明                       |
+|---------|---------|-------------------------|--------------------------|
+| **体验优化** | ✅ 已完成 | 多处优化                    | -                        |
 | 离线/弱网体验 | ✅ 已完成 | `FeedRepositoryImpl.kt` | 离线优先策略，Room缓存，LoadMore报错 |
-| 图片加载优化 | ✅ 已完成 | 全局 | Coil异步加载+缓存              |
-| 列表滑动优化 | ✅ 已完成 | `HomeScreen.kt` | LazyList Key优化           |
-| 视频播放支持 | ✅ 已完成 | `VideoPlayer.kt` | Media3 ExoPlayer         |
-| 话题页面 | ✅ 已完成 | `HashtagScreen.kt` | 话题词点击跳转                  |
+| 图片加载优化 | ✅ 已完成 | 全局                      | Coil异步加载+缓存              |
+| 列表滑动优化 | ✅ 已完成 | `HomeScreen.kt`         | LazyList Key优化           |
+| 视频播放支持 | ✅ 已完成 | `VideoPlayer.kt`        | Media3 ExoPlayer         |
+| 话题页面 | ✅ 已完成 | `HashtagScreen.kt`      | 话题词点击跳转                  |
+|视频竖刷组件| ✅已完成|                         | 只有但视频的post支持竖直下滑切换帖子     |
 
 #### 功能完成统计
 
@@ -282,10 +283,6 @@ PostEntity: 数据库实体 - PostEntity.kt
 ---
 
 ### 3. UI架构设计
-
-#### Jetpack Compose
-
-使用**Jetpack Compose**构建UI，摒弃传统XML布局：
 #### UI组件库
 | 组件名                     | 功能描述              | 复用场景 | 文件位置 |
 |-------------------------|-------------------|----------|----------|
@@ -332,7 +329,7 @@ Column
 | **PostCard** | 帖子卡片（封面+标题+作者+点赞） | `PostCard.kt` |
 
 
-#### PostCard组件实现
+##### PostCard组件实现
 - **文件**: `presentation/home/components/PostCard.kt`
 - 使用card库
 - 1. 封面图片/视频
@@ -342,12 +339,12 @@ Column
 ![postCard.png](https://github.com/haoyuh3/CrossiantApp/blob/d9b6ecf0be38c5d9e7b8cd02087976d2bc76e6b2/Progress/PostCard.png)
 ---
 
-#### 双列瀑布流实现
+##### 双列瀑布流实现
 
 **LazyVerticalStaggeredGrid配置** (presentation/home/HomeScreen.kt:153-195)
 - 使用LazyVerticalStaggeredGrid组件
 ---
-#### VideoPlayer实现
+##### VideoPlayer实现
 - 使用ExoPlayer组件
 - 自动创建与释放: 使用 remember 来创建和保留 ExoPlayer 实例，确保在 videoUrl 变化时重新创建播放器，
 - Composable 离开屏幕时调用 exoPlayer.release()，有效地防止了内存泄漏
@@ -356,7 +353,7 @@ Column
   ![VideoPlayer.png](https://github.com/haoyuh3/CrossiantApp/blob/83cb9633a8aba968dd2914b395e2e9c2981a524d/Progress/VideoPlayer.png)
 ---
 
-#### HomeViewModel
+##### HomeViewModel
 **1. 首屏加载**
 **流程**：
 1. 设置加载状态 `InitLoading`
@@ -394,7 +391,7 @@ val pullRefreshState = rememberPullRefreshState(
 | 作者信息展示 | 头像 + 昵称 + 关注按钮                  | `DetailTopBar.kt:22-82` |
 | 底部操作栏 | 评论框(禁用) + 点赞/评论/收藏/分享按钮         | `DetailBottomBar.kt:23-119` |
 ---
-#### 整体布局结构
+##### 整体布局结构
 
 **外层容器**
 - 使用Column作为主容器，设置fillMaxSize填充可用空间
@@ -421,7 +418,7 @@ val pullRefreshState = rememberPullRefreshState(
 | 昵称/简介编辑 | Dialog编辑 + SharedPreferences存储 | `ProfileScreen.kt:254-333` |
 | 编辑图标 | 点击弹出编辑对话框 | `ProfileScreen.kt:127-147` |
 
-#### 个人首页
+##### 个人首页
 - **个人** 头像，关注，粉丝，喜欢
 - **实现要求**：
     - **Column** 是一个垂直方向的线性布局 包括(ICON + TXT + ROW)
@@ -435,8 +432,11 @@ val pullRefreshState = rememberPullRefreshState(
 ---
 ![followList.image](https://github.com/haoyuh3/CrossiantApp/blob/fe812653d798f470796456c9f0e442d5db2740e2/Progress/followList.png)
 ---
+#### 3.7 动画和页面跳转
+![不同网络状态下刷新](E:\code_project\kotlinProject\Croissant\Progress\video\不同网络状态下刷新.webm)
+![视频滑动](E:\code_project\kotlinProject\Croissant\Progress\video\视频滑动刷新.webm)
 
-#### 3.7 性能优化技术
+#### 3.8 性能优化技术
 
 **1. LazyList的Key优化**
 ```kotlin
@@ -522,17 +522,6 @@ interface FeedApi {
 Network DTO ←→ Domain Model ←→ Database Entity
   (PostDto)      (Post)          (PostEntity)
 ```
-
-**关键Mapper实现：**
-
-```kotlin
-// data/model/FeedResponse.kt
-fun PostDto.toDomain(): Post {}
-// data/local/mapper/PostMapper.kt
-fun Post.toEntity(): PostEntity {}
-fun PostEntity.toDomain(): Post {}
-```
-
 **设计原则：**
 - Domain Model是纯业务模型，不包含任何序列化注解
 - DTO负责网络传输，使用`@SerializedName`适配后端字段
@@ -561,7 +550,6 @@ fun PostEntity.toDomain(): Post {}
 - composable(route = Routes.HOME)/ Routes.Profile 配置导航路由
 ---
 ### 6. 依赖注入（Hilt）AppModule.kt
----
 ### 7. 工具类
 
 | 工具类 | 功能 | 文件位置 |
@@ -576,7 +564,7 @@ fun PostEntity.toDomain(): Post {}
 
 ### 1. 架构设计的收获
 ---
-#### 1.1 MVVM在Compose中的适配
+#### 1.1 MVVM在Compose中的适配与MVVM状态更新
 
 传统MVVM使用LiveData + XML，迁移到Compose后的变化：
 
@@ -584,8 +572,14 @@ fun PostEntity.toDomain(): Post {}
 |--------|---------|--------------|
 | **状态容器** | LiveData | StateFlow / State |
 | **UI更新触发** | observe(lifecycle) { } | collectAsState() |
-| **双向绑定** | DataBinding | 不推荐（单向数据流） |
+| **双向绑定** | DataBinding | |
 | **生命周期感知** | LiveData自动处理 | collectAsStateWithLifecycle() |
+---
+#### 1.2 熟悉多种UI组件
+
+- LazyVerticalStaggeredGrid
+- EXOPlayer
+- HorizontalPager
 ---
 
 ### 2. 技术选型的反思
@@ -595,14 +589,7 @@ fun PostEntity.toDomain(): Post {}
 **选型理由：**
 - **声明式UI**减少80%的样板代码（相比XML + findViewById）
 - **预览功能**：`@Preview`注解实现组件级调试
-
-**实践中的"坑"：**
-
-1. **重组性能问题**
-2. **副作用管理混淆**
-    - `LaunchedEffect`：一次性操作（如数据加载）
-    - `DisposableEffect`：需要清理的副作用（如注册监听器）
-    - `SideEffect`：每次重组都执行（极少使用）
+- **回调函数**： 使用回调函数便于触发状态改变， 按钮回调
 ---
 
 
@@ -610,8 +597,9 @@ fun PostEntity.toDomain(): Post {}
 
 **存在的问题：**
 
-1 **无网缺少重试机制**
-2.**缺少缓存过期策略（TTL）**
+- 1 **无网缺少重试机制**
+    - 从无网络到有网络多次重试提升用户体验
+- 2.**缺少缓存过期策略（TTL）**
     - 用户可能看到一周前的旧数据
     - 解决方案：添加`cached_at`字段，超过1小时强制刷新
 ---
@@ -626,19 +614,16 @@ fun PostEntity.toDomain(): Post {}
 - 无法实现跨端同步
 
 #### 3.2 缺少数据一致性保证
-
-**问题场景：**
-```
-时间线：
-10:00 - 用户A在首页点赞帖子X（本地计数 = 100）
-10:05 - 用户B也点赞了帖子X（服务器计数 = 101）
-10:10 - 用户A刷新首页（API返回计数 = 200，用户A的点赞被覆盖！）
-```
-
 **根本原因：**
 - 点赞数同时存在于SharedPreferences和API响应
 - 没有冲突解决策略
 ---
+
+#### 3.3 首刷体验改进
+- 考虑到api调用时间， 首屏数据可以调用缓存或者新数据衔接到缓存数据后面
+
+#### 3.4 详情页面添加自动轮播功能
+- 展示首张照片后，一定时间内切换下一张
 
 ### 4. 项目总结与未来展望
 
@@ -660,20 +645,17 @@ fun PostEntity.toDomain(): Post {}
 
 **目标**
 - [ ] **音乐播放功能**
--
 - [ ] **视屏流竖滑**
     - 点赞/关注操作调用后端API
     - WorkManager实现离线队列
     - 冲突解决策略
--
 - [ ] **评论系统**
     - 评论列表展示（RecyclerView → LazyColumn）
     - 回复功能（嵌套评论）
     - @提及用户
-
 - [ ] **无网/弱网络**
     - 重试刷新
-    - 
+    - 首屏数据加载优化， 防止过久API加载影响用户体验
 ---
 
 #### 4.3 反思与感悟
