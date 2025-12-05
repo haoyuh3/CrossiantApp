@@ -75,20 +75,30 @@ fun NavGraph(
                 animatedVisibilityScope = this@composable, // 动画可见性作用域
                 viewModel = homeViewModel,
                 onNavigateToDetail = { post ->
-                    // 使用视频流页面（支持上下滑动）
-//                    val clickedIndex = posts.indexOfFirst { it.postId == post.postId }
-//                    navController.navigate(Routes.videoFeed(post.postId, clickedIndex.coerceAtLeast(0)))
-//
-//                    // 传递完整的视频列表
-//                    navController.currentBackStackEntry
-//                        ?.savedStateHandle
-//                        ?.set("post_list", ArrayList(posts))
+                    if (post.isVideo) { // 1. 判断是否为视频帖子
+                        // --- 如果是视频，则导航到可上下滑动的视频流页面 ---
 
-                    // 如果想用原来的单页详情，注释上面的代码，取消注释下面的：
-                     navController.navigate(Routes.detail(post.postId))
-                     navController.currentBackStackEntry
-                         ?.savedStateHandle
-                         ?.set("selected_post", post)
+                        // 2. 筛选出所有视频帖子
+                        val videoPosts = posts.filter { it.isVideo }
+
+                        // 3. 找到当前点击的视频在视频列表中的索引
+                        val clickedIndexInVideos = videoPosts.indexOfFirst { it.postId == post.postId }
+
+                        // 4. 导航到 VideoFeedScreen
+                        navController.navigate(Routes.videoFeed(post.postId, clickedIndexInVideos.coerceAtLeast(0)))
+
+                        // 5. 传递筛选后的纯视频列表
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("post_list", ArrayList(videoPosts))
+
+                    } else {
+                        // --- 如果不是视频（如图文），则导航到原来的单页详情页 ---
+                        navController.navigate(Routes.detail(post.postId))
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("selected_post", post)
+                    }
                 },
                 shouldRefresh = shouldRefresh
             )
@@ -128,37 +138,37 @@ fun NavGraph(
             )
         }
 
-//        // 视频流页面（垂直滑动）
-//        composable(route = Routes.VIDEO_FEED) { backStackEntry ->
-//            // 获取路由参数
-//            val postId = backStackEntry.arguments?.getString("postId") ?: ""
-//            val index = backStackEntry.arguments?.getString("index")?.toIntOrNull() ?: 0
-//
-//            // 从 SavedStateHandle 获取视频列表
-//            val postList = backStackEntry.savedStateHandle.get<ArrayList<Post>>("post_list")
-//                ?: arrayListOf()
-//
-//            if (postList.isNotEmpty()) {
-//                VideoFeedScreen(
-//                    postList = postList,
-//                    initialIndex = index,
-//                    sharedTransitionScope = this@SharedTransitionLayout,
-//                    animatedVisibilityScope = this@composable,
-//                    onNavigateBack = {
-//                        // 返回前设置刷新信号
-//                        navController.previousBackStackEntry
-//                            ?.savedStateHandle
-//                            ?.set("refresh_from_detail", true)
-//
-//                        navController.navigateUp()
-//                    },
-//                    onHashtagClick = { hashtag ->
-//                        val encoded = java.net.URLEncoder.encode(hashtag, "UTF-8")
-//                        navController.navigate(Routes.hashtag(encoded))
-//                    }
-//                )
-//            }
-//        }
+        // 视频流页面（垂直滑动）
+        composable(route = Routes.VIDEO_FEED) { backStackEntry ->
+            // 获取路由参数
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            val index = backStackEntry.arguments?.getString("index")?.toIntOrNull() ?: 0
+
+            // 从 SavedStateHandle 获取视频列表
+            val postList = backStackEntry.savedStateHandle.get<ArrayList<Post>>("post_list")
+                ?: arrayListOf()
+
+            if (postList.isNotEmpty()) {
+                VideoFeedScreen(
+                    postList = postList,
+                    initialIndex = index,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this@composable,
+                    onNavigateBack = {
+                        // 返回前设置刷新信号
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("refresh_from_detail", true)
+
+                        navController.navigateUp()
+                    },
+                    onHashtagClick = { hashtag ->
+                        val encoded = java.net.URLEncoder.encode(hashtag, "UTF-8")
+                        navController.navigate(Routes.hashtag(encoded))
+                    }
+                )
+            }
+        }
 
         composable(route = Routes.HASHTAG) { backStackEntry ->
             val hashtag = java.net.URLDecoder.decode(

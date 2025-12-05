@@ -18,7 +18,10 @@ data class Post(
     val music: Music?,
     val likeCount: Int = 0,         // 从sharePreference读取的本地状态
     val isLiked: Boolean = false    // 从sharePreference读取的本地状态
-) : Parcelable
+) : Parcelable {
+    val isVideo: Boolean
+        get() = (clips.size == 1) and (clips[0].type == ClipType.VIDEO)
+}
 
 /**
  * 作者信息

@@ -433,7 +433,7 @@ val pullRefreshState = rememberPullRefreshState(
 - 头像 + 名字 + 关注按钮
 - 使用Room数据库存储关注列表
 ---
-![followList.image](https://github.com/haoyuh3/CrossiantApp/blob/595c0d508866488ca4d5dd76a641ef5e8a38d333/Progress/followList.png)
+![followList.image](https://github.com/haoyuh3/CrossiantApp/blob/fe812653d798f470796456c9f0e442d5db2740e2/Progress/followList.png)
 ---
 
 #### 3.7 性能优化技术
@@ -509,10 +509,6 @@ interface FeedApi {
         @Query("count") count: Int,
         @Query("accept_video_clip") acceptVideoClip: Boolean = false
     ): FeedResponse
-
-    companion object {
-        const val BASE_URL = "https://college-training-camp.bytedance.com/"
-    }
 }
 ```
 **网络配置（AppModule.kt）：**
@@ -575,21 +571,6 @@ fun PostEntity.toDomain(): Post {}
 | **ImageUtil** | 图片处理工具 | `util/ImageUtil.kt` |
 | **Constants** | 应用常量定义 | `util/Constants.kt` |
 
----
-
-### ⚠️ 未实现/待优化功能
-
-| 功能项 | 当前状态   | 影响范围 | 优先级 |
-|--------|--------|----------|--------|
-| **视频播放** | 无封面可播放 | 详情页视频显示为黑色框 + 播放图标 | 🔴 高 |
-| **评论功能** | 输入框禁用  | 无法发表评论 | 🟡 中 |
-| **收藏功能** | 按钮占位   | 点击无效果 | 🟢 低 |
-| **分享功能** | 仅打印日志  | 无法分享内容 | 🟢 低 |
-| **API同步** | 仅本地存储  | 点赞/关注不同步到服务器 | 🔴 高 |
-| **缓存过期策略** | 永久缓存   | 数据可能过时 | 🟡 中 |
-| **离线操作队列** | 无队列    | 离线操作不会重试 | 🟡 中 |
-
----
 
 ## 个人思考
 
@@ -622,37 +603,15 @@ fun PostEntity.toDomain(): Post {}
     - `LaunchedEffect`：一次性操作（如数据加载）
     - `DisposableEffect`：需要清理的副作用（如注册监听器）
     - `SideEffect`：每次重组都执行（极少使用）
-
-**经验总结：**
-- 初期重组开销大，需要配合`remember`、`derivedStateOf`优化
-- 学习曲线陡峭，但掌握后开发效率显著提升
-
 ---
 
 
 #### 2.2 离线优先策略的局限
 
-**当前实现：**
-```kotlin
-suspend fun getFeed(): Result<List<Post>> {
-    return try {
-        // 1. 尝试网络请求
-        val posts = api.getFeed()
-        // 2. 成功后更新缓存
-        dao.replaceAll(posts)
-        Result.success(posts)
-    } catch (e: Exception) {
-        // 3. 失败时读取缓存
-        val cached = dao.getAllPosts()
-        if (cached.isNotEmpty()) Result.success(cached)
-        else Result.failure(e)
-    }
-}
-```
-
 **存在的问题：**
 
-1. **缺少缓存过期策略（TTL）**
+1 **无网缺少重试机制**
+2.**缺少缓存过期策略（TTL）**
     - 用户可能看到一周前的旧数据
     - 解决方案：添加`cached_at`字段，超过1小时强制刷新
 ---
@@ -665,8 +624,6 @@ suspend fun getFeed(): Result<List<Post>> {
 - 用户换设备后所有点赞记录丢失
 - 作者看不到点赞数增加
 - 无法实现跨端同步
-
-**改进方案1：乐观更新 + 后台同步**
 
 #### 3.2 缺少数据一致性保证
 
@@ -701,37 +658,30 @@ suspend fun getFeed(): Result<List<Post>> {
 
 #### 4.2 待实现功能规划
 
-**短期目标（1-2周）：**
+**目标**
 - [ ] **音乐播放功能**
 -
-- [ ] **API同步机制**
+- [ ] **视屏流竖滑**
     - 点赞/关注操作调用后端API
     - WorkManager实现离线队列
     - 冲突解决策略
-
-**中期目标（1个月）：**
+-
 - [ ] **评论系统**
     - 评论列表展示（RecyclerView → LazyColumn）
     - 回复功能（嵌套评论）
     - @提及用户
 
-- [ ] **缓存策略优化**
-    - 添加TTL（Time-To-Live）
-    - 差异更新（Delta Sync）
-    - 缓存容量管理（LRU淘汰）
+- [ ] **无网/弱网络**
+    - 重试刷新
+    - 
 ---
 
 #### 4.3 反思与感悟
 
-**成功经验：**
-1. **渐进式开发**：先实现核心功能（Feed流），再完善细节（点赞、关注）
-2. **文档驱动**：在开发过程中同步更新README，降低维护成本
-3. **工具链熟悉**：熟练使用Android Studio调试工具、Layout Inspector、Profiler
-
 **遇到的挑战：**
 1. **Compose学习曲线**：初期对重组机制理解不足，导致性能问题
 2. **状态管理混乱**：一度同时使用LiveData、StateFlow、State，后统一为StateFlow
-3. **过度设计**：早期为简单功能创建过多抽象层，后期简化
+3. **数据存储选型**： 部分数据一开始使用sharepreference存储，后续使用Room开发，存在部分数据不一致问题
 
 
 ## 附录
@@ -784,5 +734,5 @@ dependencies {
 
 **文档版本**：v1.0
 **最后更新**：2025-12-01
-**作者**：Croissant项目组
+**作者**：黄浩宇
 **联系方式**：[项目仓库](https://github.com/haoyuh3/CrossiantApp)
