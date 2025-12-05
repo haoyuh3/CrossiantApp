@@ -36,66 +36,57 @@ Croissant是一个基于字节跳动训练营课题的**UGC内容社区客户端
 
 | 功能模块 | 子模块      | 完成状态 | 实现位置 | 备注 |
 |---------|----------|---------|----------|------|
-| **应用框架** | 底部导航栏    | ✅ 已完成 | `BottomNavigationBar.kt` | 支持"首页"和"我"切换 |
-| | 首页Tab    | ✅ 已完成 | `HomeTabItem.kt` | 默认"社区"Tab，其他Tab占位 |
-| **双列瀑布流** | 双列框架     | ✅ 已完成 | `HomeScreen.kt:153-195` | LazyVerticalStaggeredGrid实现 |
-| | 下拉刷新     | ✅ 已完成 | `HomeScreen.kt` | PullRefresh实现 |
-| | 上滑LoadMore | ✅ 已完成 | `HomeViewModel.kt` | 触底自动加载 |
-| | 首刷失败空态   | ✅ 已完成 | `HomeScreen.kt` | Error状态处理 |
-| | Loading提示 | ✅ 已完成 | `HomeScreen.kt` | Loading状态展示 |
-| | 作品卡片     | ✅ 已完成 | `PostCard.kt` | 封面+标题+作者+点赞 |
-| | 封面裁切规则   | ✅ 已完成 | `PostCard.kt` | 3:4 ~ 4:3宽高比限制 |
-| | 标题展示     | ✅ 已完成 | `PostCard.kt` | 最长2行，超出截断 |
-| | 点赞交互     | ✅ 已完成 | `PostCard.kt` | 本地持久化存储 |
-| **详情页** | 顶部作者区    | ✅ 已完成 | `DetailTopBar.kt` | 返回+作者信息+关注按钮 |
-| | 关注功能     | ✅ 已完成 | `DetailViewModel.kt:97-123` | SP+Room双写 |
-| | 底部交互区    | ✅ 已完成 | `DetailBottomBar.kt` | 评论框+点赞+评论+收藏+分享 |
-| | 点赞交互     | ✅ 已完成 | `DetailViewModel.kt:76-95` | SP持久化 |
-| | 分享交互     | ⚠️ 部分完成 | `DetailBottomBar.kt` | 仅打印日志 |
-| | 横滑容器     | ✅ 已完成 | `DetailContent.kt:86-134` | HorizontalPager实现 |
-| | 容器宽高比    | ✅ 已完成 | `DetailContent.kt:99` | 使用首图比例，3:4~16:9限制 |
-| | 图片切换     | ✅ 已完成 | `DetailContent.kt` | 支持手动横滑 |
-| | 加载态/失败态  | ✅ 已完成 | `DetailContent.kt:112-126` | SubcomposeAsyncImage实现 |
-| | 进度条      | ✅ 已完成 | `DetailContent.kt:140-149` | 条状进度，跟随滑动 |
-| | 标题区      | ✅ 已完成 | `DetailContent.kt:48-54` | 完整展示不截断 |
-| | 正文区      | ✅ 已完成 | `DetailContent.kt:58-64` | 完整展示不截断 |
-| | 话题词高亮    | ✅ 已完成 | `DetailContent.kt:154-217` | ClickableText实现 |
-| | 话题词点击    | ✅ 已完成 | `HashtagScreen.kt` | 跳转话题页面 |
-| | 发布日期     | ✅ 已完成 | `DetailContent.kt:69-73` + `DateUtil.kt` | 相对时间格式化 |
-| **个人主页** | 个人信息展示   | ✅ 已完成 | `ProfileScreen.kt` | 头像+昵称+简介 |
-| | 统计数据     | ✅ 已完成 | `ProfileScreen.kt:92-123` | 关注/粉丝/获赞（占位数据） |
-| | 头像编辑     | ✅ 已完成 | `ProfileScreen.kt:150-169` | 图片选择器 |
-| | 昵称/简介编辑  | ✅ 已完成 | `ProfileScreen.kt:254-333` | Dialog编辑 |
+| **应用框架** | 底部导航栏    | 已完成 | `BottomNavigationBar.kt` | 支持"首页"和"我"切换 |
+| | 首页Tab    | 已完成 | `HomeTabItem.kt` | 默认"社区"Tab，其他Tab占位 |
+| **双列瀑布流** | 双列框架     | 已完成 | `HomeScreen.kt:153-195` | LazyVerticalStaggeredGrid实现 |
+| | 下拉刷新     | 已完成 | `HomeScreen.kt` | PullRefresh实现 |
+| | 上滑LoadMore | 已完成 | `HomeViewModel.kt` | 触底自动加载 |
+| | 首刷失败空态   | 已完成 | `HomeScreen.kt` | Error状态处理 |
+| | Loading提示 | 已完成 | `HomeScreen.kt` | Loading状态展示 |
+| | 作品卡片     | 已完成 | `PostCard.kt` | 封面+标题+作者+点赞 |
+| | 封面裁切规则   | 已完成 | `PostCard.kt` | 3:4 ~ 4:3宽高比限制 |
+| | 标题展示     | 已完成 | `PostCard.kt` | 最长2行，超出截断 |
+| | 点赞交互     | 已完成 | `PostCard.kt` | 本地持久化存储 |
+| **详情页** | 顶部作者区    | 已完成 | `DetailTopBar.kt` | 返回+作者信息+关注按钮 |
+| | 关注功能     | 已完成 | `DetailViewModel.kt:97-123` | SP+Room双写 |
+| | 底部交互区    | 已完成 | `DetailBottomBar.kt` | 评论框+点赞+评论+收藏+分享 |
+| | 点赞交互     | 已完成 | `DetailViewModel.kt:76-95` | SP持久化 |
+| | 分享交互     | 部分完成 | `DetailBottomBar.kt` | 仅打印日志 |
+| | 横滑容器     | 已完成 | `DetailContent.kt:86-134` | HorizontalPager实现 |
+| | 容器宽高比    | 已完成 | `DetailContent.kt:99` | 使用首图比例，3:4~16:9限制 |
+| | 图片切换     | 已完成 | `DetailContent.kt` | 支持手动横滑 |
+| | 加载态/失败态  | 已完成 | `DetailContent.kt:112-126` | SubcomposeAsyncImage实现 |
+| | 进度条      | 已完成 | `DetailContent.kt:140-149` | 条状进度，跟随滑动 |
+| | 标题区      | 已完成 | `DetailContent.kt:48-54` | 完整展示不截断 |
+| | 正文区      | 已完成 | `DetailContent.kt:58-64` | 完整展示不截断 |
+| | 话题词高亮    | 已完成 | `DetailContent.kt:154-217` | ClickableText实现 |
+| | 话题词点击    | 已完成 | `HashtagScreen.kt` | 跳转话题页面 |
+| | 发布日期     | 已完成 | `DetailContent.kt:69-73` + `DateUtil.kt` | 相对时间格式化 |
+| **个人主页** | 个人信息展示   | 已完成 | `ProfileScreen.kt` | 头像+昵称+简介 |
+| | 统计数据     | 已完成 | `ProfileScreen.kt:92-123` | 关注/粉丝/获赞（占位数据） |
+| | 头像编辑     | 已完成 | `ProfileScreen.kt:150-169` | 图片选择器 |
+| | 昵称/简介编辑  | 已完成 | `ProfileScreen.kt:254-333` | Dialog编辑 |
 
 #### 进阶功能完成度
 
 | 功能模块 | 子模块 | 完成状态 | 实现位置 | 备注 |
 |---------|--------|---------|----------|------|
-| **页面转场** | 转场动画 | ❌ 未实现 | - | 点击进场/退场、侧滑跟手 |
+| **页面转场** | 转场动画 | 实现进场退场动画 | - | 点击进场/退场、侧滑跟手 |
 | **详情页** | 背景音乐 | ❌ 未实现 | - | 静音按钮、播控逻辑、状态记忆 |
 | | 自动轮播 | ❌ 未实现 | - | 图片自动切换 |
-| | 视频片段 | ✅ 已完成 | `VideoPlayer.kt` | ExoPlayer实现 |
+| | 视频片段 |   已完成 | `VideoPlayer.kt` | ExoPlayer实现 |
 
 #### 自由探索完成度
 
 | 思考方向 | 完成状态 | 实现位置                    | 说明                       |
 |---------|---------|-------------------------|--------------------------|
-| **体验优化** | ✅ 已完成 | 多处优化                    | -                        |
-| 离线/弱网体验 | ✅ 已完成 | `FeedRepositoryImpl.kt` | 离线优先策略，Room缓存，LoadMore报错 |
-| 图片加载优化 | ✅ 已完成 | 全局                      | Coil异步加载+缓存              |
-| 列表滑动优化 | ✅ 已完成 | `HomeScreen.kt`         | LazyList Key优化           |
-| 视频播放支持 | ✅ 已完成 | `VideoPlayer.kt`        | Media3 ExoPlayer         |
-| 话题页面 | ✅ 已完成 | `HashtagScreen.kt`      | 话题词点击跳转                  |
-|视频竖刷组件| ✅已完成|                         | 只有但视频的post支持竖直下滑切换帖子     |
-
-#### 功能完成统计
-
-| 类别 | 总计 | 已完成 | 未完成 | 部分完成 | 完成率 |
-|------|------|--------|--------|----------|--------|
-| **基础功能** | 30 | 28 | 1 | 1 | 93% |
-| **进阶功能** | 4 | 1 | 3 | 0 | 25% |
-| **自由探索** | 6 | 6 | 0 | 0 | 100% |
-| **总计** | 40 | 35 | 4 | 1 | 87.5% |
+| **体验优化** | 已完成 | 多处优化                    | -                        |
+| 离线/弱网体验 | 已完成 | `FeedRepositoryImpl.kt` | 离线优先策略，Room缓存，LoadMore报错 |
+| 图片加载优化 | 已完成 | 全局                      | Coil异步加载+缓存              |
+| 列表滑动优化 | 已完成 | `HomeScreen.kt`         | LazyList Key优化           |
+| 视频播放支持 | 已完成 | `VideoPlayer.kt`        | Media3 ExoPlayer         |
+| 话题页面 | 已完成 | `HashtagScreen.kt`      | 话题词点击跳转                  |
+|视频竖刷组件| 部分完成|                         | 只有纯视频post支持竖直下滑切换帖子     |
 
 ---
 
