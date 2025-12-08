@@ -25,8 +25,10 @@ Croissant是一个基于字节跳动训练营课题的**UGC内容社区客户端
 - 离线缓存支持：无网络环境下仍可浏览已缓存内容
 
 **视频Demo**
-- (主要功能)：https://cmu.zoom.us/rec/share/tsmaxl6wOHQ5EkEn2f6uAPu-xb72l0OKZRiiOvvS-dNdvy5lTznsh_oBs9WGiP3Q.Vk-HTOrOyHGfFjBZ | 密码: ZKsH+tM0
-- (补充视频 视频下滑功能|头像|话题跳转)： https://cmu.zoom.us/rec/share/GrFn-zMaPafgcYXL9CJYTcO8j3wsyj_E4VXowvQZ5_zdQk5mROGnJsBm2CjCasGP.mJ-kDWXH_6AQVptd | 密码: +pisS77i
+- 主要功能：
+- https://cmu.zoom.us/rec/share/tsmaxl6wOHQ5EkEn2f6uAPu-xb72l0OKZRiiOvvS-dNdvy5lTznsh_oBs9WGiP3Q.Vk-HTOrOyHGfFjBZ | 密码: ZKsH+tM0
+- 补充视频 视频下滑功能|头像|话题跳转： 
+- https://cmu.zoom.us/rec/share/GrFn-zMaPafgcYXL9CJYTcO8j3wsyj_E4VXowvQZ5_zdQk5mROGnJsBm2CjCasGP.mJ-kDWXH_6AQVptd | 密码: +pisS77i
 ---
 
 ## 实现方案/框架介绍
