@@ -27,7 +27,7 @@ Croissant是一个基于字节跳动训练营课题的**UGC内容社区客户端
 **视频Demo**
 - 主要功能：
 - https://github.com/user-attachments/assets/e8fd0102-bf46-4b12-adaf-72f1acbeaac5
-- - 补充视频 视频下滑功能|头像|话题跳转： 
+- 补充视频 视频下滑功能|头像|话题跳转： 
 - https://github.com/user-attachments/assets/8c93f548-4681-4696-b34f-530e97624407
 ---
 
