@@ -138,10 +138,16 @@ private fun CommunityTabContent(
     // 监听错误消息并显示Snackbar
     LaunchedEffect(errorMessage) {
         errorMessage?.let { message ->
-            snackbarHostState.showSnackbar(
+            val result = snackbarHostState.showSnackbar(
                 message = message,
-                duration = SnackbarDuration.Short
+                actionLabel = "重试",
+                duration = SnackbarDuration.Long,
+                withDismissAction = true
             )
+            // 如果用户点击了重试按钮
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.refresh()
+            }
             viewModel.clearErrorMessage()
         }
     }
@@ -258,22 +264,48 @@ private fun CommunityTabContent(
         // Snackbar 提示
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp),
             snackbar = { snackbarData ->
                 // 自定义 Snackbar 的外观
                 Snackbar(
-                    modifier = Modifier
-                        .width(280.dp) // 宽度
-                        .padding(horizontal = 16.dp), // 内边距
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(12.dp),
                     containerColor = MaterialTheme.colorScheme.inverseSurface,
-                    contentColor = MaterialTheme.colorScheme.inverseOnSurface
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    action = {
+                        // 显示重试图标按钮
+                        snackbarData.visuals.actionLabel?.let {
+                            IconButton(
+                                onClick = { snackbarData.performAction() }
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    },
+                    dismissAction = {
+                        // 显示关闭按钮
+                        if (snackbarData.visuals.withDismissAction) {
+                            IconButton(
+                                onClick = { snackbarData.dismiss() }
+                            ) {
+                                Text(
+                                    text = "✕",
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colorScheme.inverseOnSurface
+                                )
+                            }
+                        }
+                    }
                 ) {
-                    // 使用 Text 组件并使其居中
+                    // Snackbar 消息文本
                     Text(
                         text = snackbarData.visuals.message,
-                        modifier = Modifier.fillMaxWidth(), // 文字居中
-                        textAlign = TextAlign.Center
+                        fontSize = 14.sp
                     )
                 }
             }
