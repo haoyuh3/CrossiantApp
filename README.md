@@ -430,7 +430,11 @@ Column
 | :---: | :---: |
 | <video src="https://github.com/user-attachments/assets/3aae2919-41cd-4058-95a6-a8757ff9bd31" controls width="300"></video> | <video src="https://github.com/user-attachments/assets/9aed9c89-522a-45df-b603-874f17f681f6" controls width="300"></video> |
 ---
-#### 3.8 性能优化技术
+#### 3.8 页面刷新重试
+- 修改网络报错UI(snackBar), 增加重试按钮
+<video src= "https://github.com/user-attachments/assets/1258876a-a864-430f-8c2f-39df37c04340"></video>
+---
+#### 3.9 性能优化技术
 
 **1. LazyList的Key优化**
 ```kotlin
